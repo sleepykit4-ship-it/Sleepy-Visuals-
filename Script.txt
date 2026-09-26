@@ -1,5 +1,5 @@
 --[[
-    Sleepy Visuals v6.5 — World Visuals
+    Sleepy Visuals v6.6 — Fixed Sky
 ]]
 
 local Lighting = game:GetService("Lighting")
@@ -103,7 +103,7 @@ IS.TextTransparency = 1; IS.ZIndex = 1001; IS.Parent = IC
 
 local IV = Instance.new("TextLabel")
 IV.Size = UDim2.new(1,0,0,14); IV.Position = UDim2.new(0,0,0,108)
-IV.BackgroundTransparency = 1; IV.Text = "v6.5"
+IV.BackgroundTransparency = 1; IV.Text = "v6.6"
 IV.TextColor3 = C.Muted; IV.TextSize = 9; IV.Font = FB
 IV.TextTransparency = 1; IV.ZIndex = 1001; IV.Parent = IC
 
@@ -139,22 +139,26 @@ local S = {
     Aura=false, Aura2=false, Trail=false, Glow=false, CustomAura=false,
     IJ=false, Spd=false, JP=false, Fling=false, AFK=false, Fly=false, Noclip=false,
     FB=false, Rainbow=false, Sounds=true,
-    -- World visuals
     Neon=false, Cinematic=false, Vignette=false, Bloom=false,
-    AmbientParticles=false, Fireflies=false, SnowFX=false, Stars=false,
-    SkyCity=false, SkySunset=false, SkyNight=false, SkySpace=false,
+    AmbientParticles=false, Fireflies=false, SnowFX=false,
     DepthOfField=false,
 }
 local OC = Lighting.ClockTime
 local OB = Lighting.Brightness
-local OriginalSkybox = {
-    SkyboxBk = Lighting.Sky.SkyboxBk,
-    SkyboxDn = Lighting.Sky.SkyboxDn,
-    SkyboxFt = Lighting.Sky.SkyboxFt,
-    SkyboxLf = Lighting.Sky.SkyboxLf,
-    SkyboxRt = Lighting.Sky.SkyboxRt,
-    SkyboxUp = Lighting.Sky.SkyboxUp,
-}
+local OFogEnd = Lighting.FogEnd
+
+-- SAFE SKY BACKUP
+local OriginalSkyData = nil
+pcall(function()
+    local sk = Lighting:FindFirstChildOfClass("Sky")
+    if sk then
+        OriginalSkyData = {
+            Bk = sk.SkyboxBk, Dn = sk.SkyboxDn, Ft = sk.SkyboxFt,
+            Lf = sk.SkyboxLf, Rt = sk.SkyboxRt, Up = sk.SkyboxUp,
+            StarCount = sk.StarCount,
+        }
+    end
+end)
 
 -- MAIN
 local MainSize = isPC and UDim2.new(0,740,0,500) or UDim2.new(0,680,0,460)
@@ -168,18 +172,13 @@ Main.BorderSizePixel = 0
 Main.Active = true
 Main.Draggable = true
 Main.Parent = SG
-cnr(Main,16)
-gr(Main,C.Bg,C.Bg2,90)
-str(Main,C.Stroke,1.5,0.2)
+cnr(Main,16); gr(Main,C.Bg,C.Bg2,90); str(Main,C.Stroke,1.5,0.2)
 
 -- TOP
 local Top = Instance.new("Frame")
-Top.Size = UDim2.new(1,0,0,50)
-Top.BackgroundColor3 = C.Panel
-Top.BorderSizePixel = 0
-Top.Parent = Main
-cnr(Top,16)
-gr(Top,C.Panel,C.Panel2,90)
+Top.Size = UDim2.new(1,0,0,50); Top.BackgroundColor3 = C.Panel
+Top.BorderSizePixel = 0; Top.Parent = Main
+cnr(Top,16); gr(Top,C.Panel,C.Panel2,90)
 
 local TC = Instance.new("Frame")
 TC.Size = UDim2.new(1,0,0,14); TC.Position = UDim2.new(0,0,1,-14)
@@ -238,7 +237,6 @@ Cls.TextColor3 = C.Dim; Cls.TextSize = 12; Cls.Font = FB
 Cls.AutoButtonColor = false; Cls.Parent = Top
 cnr(Cls,8); str(Cls,C.Stroke,1,0.5)
 
--- TOGGLE
 local Tg = Instance.new("TextButton")
 Tg.Size = UDim2.new(0,58,0,58); Tg.Position = UDim2.new(0,20,0.5,-29)
 Tg.BackgroundColor3 = Color3.fromRGB(30,26,48); Tg.Text = "SV"
@@ -248,11 +246,9 @@ Tg.Draggable = true; Tg.Parent = SG
 cnr(Tg,16); str(Tg,Color3.fromRGB(255,255,255),2,0.2)
 
 local isAnimating = false
-
 local function closeMenu()
     if isAnimating then return end
-    isAnimating = true
-    playSound()
+    isAnimating = true; playSound()
     TweenService:Create(Main, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
         Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0),
     }):Play()
@@ -265,14 +261,11 @@ local function closeMenu()
     TweenService:Create(Tg, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
         Size = UDim2.new(0, 58, 0, 58), Position = UDim2.new(0, 20, 0.5, -29),
     }):Play()
-    task.wait(0.3)
-    isAnimating = false
+    task.wait(0.3); isAnimating = false
 end
-
 local function openMenu()
     if isAnimating then return end
-    isAnimating = true
-    playSound()
+    isAnimating = true; playSound()
     TweenService:Create(Tg, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
         Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0, 49, 0.5, 0),
     }):Play()
@@ -286,13 +279,10 @@ local function openMenu()
         Size = MainSize, Position = MainPos,
     }):Play()
     TweenService:Create(Main, TweenInfo.new(0.35), {BackgroundTransparency = 0}):Play()
-    task.wait(0.35)
-    isAnimating = false
+    task.wait(0.35); isAnimating = false
 end
-
 Cls.MouseButton1Click:Connect(closeMenu)
 Tg.MouseButton1Click:Connect(openMenu)
-
 if isPC then
     UIS.InputBegan:Connect(function(input, gp)
         if gp then return end
@@ -333,7 +323,7 @@ PN.TextColor3 = C.Text; PN.TextSize = 10; PN.Font = FB; PN.Parent = Prof
 
 local PT = Instance.new("TextLabel")
 PT.Size = UDim2.new(1,-8,0,10); PT.Position = UDim2.new(0,4,0,82)
-PT.BackgroundTransparency = 1; PT.Text = "◆ PREMIUM v6.5"
+PT.BackgroundTransparency = 1; PT.Text = "◆ PREMIUM v6.6"
 PT.TextColor3 = C.Acc2; PT.TextSize = 8; PT.Font = FB; PT.Parent = Prof
 
 local Nav = Instance.new("Frame")
@@ -378,22 +368,16 @@ end
 local function mkTab()
     local c = Instance.new("ScrollingFrame")
     c.Size = UDim2.new(1, 0, 1, 0)
-    c.BackgroundTransparency = 1
-    c.BorderSizePixel = 0
-    c.ScrollBarThickness = 3
-    c.ScrollBarImageColor3 = C.Acc1
-    c.CanvasSize = UDim2.new(0, 0, 0, 500)
-    c.Visible = false
-    c.Parent = Content
+    c.BackgroundTransparency = 1; c.BorderSizePixel = 0
+    c.ScrollBarThickness = 3; c.ScrollBarImageColor3 = C.Acc1
+    c.CanvasSize = UDim2.new(0, 0, 0, 500); c.Visible = false; c.Parent = Content
     local layout = Instance.new("UIListLayout")
     layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 7)
-    layout.Parent = c
+    layout.Padding = UDim.new(0, 7); layout.Parent = c
     layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         c.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 30)
     end)
-    table.insert(Cds, c)
-    return c
+    table.insert(Cds, c); return c
 end
 
 local VC = mkTab()
@@ -535,7 +519,9 @@ local function mkButton(p,txt,cb)
     end)
 end
 
+-- ============================================================
 -- ESP
+-- ============================================================
 local EF = Instance.new("Folder"); EF.Name="ESP_Folder"; EF.Parent=SG
 local eC = {}
 local function remE(p) local e=EF:FindFirstChild(p.Name); if e then e:Destroy() end end
@@ -907,42 +893,41 @@ local function dsRb()
     Lighting.FogColor = Color3.fromRGB(192,192,192)
 end
 
+-- ============================================================
 -- WORLD VISUALS
-local worldEffects = {}
+-- ============================================================
+local worldConns = {}
 
--- 1. Neon World (всё светится)
+-- NEON
 local function enNeon()
     for _, v in ipairs(workspace:GetDescendants()) do
-        if v:IsA("BasePart") and v.Material ~= Enum.Material.Neon and not v:FindFirstChild("SVNeon") then
-            local marker = Instance.new("BoolValue"); marker.Name = "SVNeon"; marker.Parent = v
+        if v:IsA("BasePart") and v.Material ~= Enum.Material.Neon then
             v:SetAttribute("SVOrigMat", tostring(v.Material))
             v.Material = Enum.Material.Neon
         end
     end
-    local conn = workspace.DescendantAdded:Connect(function(v)
+    worldConns.Neon = workspace.DescendantAdded:Connect(function(v)
         if S.Neon and v:IsA("BasePart") then
-            task.wait(0.1)
+            task.wait(0.05)
             v:SetAttribute("SVOrigMat", tostring(v.Material))
             v.Material = Enum.Material.Neon
-            local m = Instance.new("BoolValue"); m.Name = "SVNeon"; m.Parent = v
         end
     end)
-    worldEffects.Neon = conn
 end
 local function dsNeon()
-    if worldEffects.Neon then worldEffects.Neon:Disconnect(); worldEffects.Neon = nil end
+    if worldConns.Neon then worldConns.Neon:Disconnect(); worldConns.Neon = nil end
     for _, v in ipairs(workspace:GetDescendants()) do
-        if v:IsA("BasePart") and v:FindFirstChild("SVNeon") then
+        if v:IsA("BasePart") then
             local orig = v:GetAttribute("SVOrigMat")
             if orig then
                 pcall(function() v.Material = Enum.Material[orig] end)
+                v:SetAttribute("SVOrigMat", nil)
             end
-            v:FindFirstChild("SVNeon"):Destroy()
         end
     end
 end
 
--- 2. Cinematic (ColorCorrection)
+-- CINEMATIC
 local cineEffect, cineBloom, cineVignette, cineDOF
 local function enCinematic()
     if not cineEffect then
@@ -966,7 +951,7 @@ local function dsCinematic()
     if cineBloom then cineBloom:Destroy(); cineBloom = nil end
 end
 
--- 3. Vignette
+-- VIGNETTE
 local function enVignette()
     if not cineVignette then
         cineVignette = Instance.new("ColorCorrectionEffect", Lighting)
@@ -974,15 +959,14 @@ local function enVignette()
     end
     cineVignette.Contrast = 0.15
     cineVignette.Brightness = -0.05
-    -- имитация виньетки через FogEnd
     Lighting.FogEnd = 300
 end
 local function dsVignette()
     if cineVignette then cineVignette:Destroy(); cineVignette = nil end
-    Lighting.FogEnd = OriginalSkybox.FogEnd or 100000
+    Lighting.FogEnd = OFogEnd
 end
 
--- 4. Bloom
+-- BLOOM
 local function enBloom()
     if not cineBloom then
         cineBloom = Instance.new("BloomEffect", Lighting)
@@ -996,7 +980,7 @@ local function dsBloom()
     if cineBloom then cineBloom:Destroy(); cineBloom = nil end
 end
 
--- 5. Ambient Particles (светящиеся частицы вокруг игрока в мире)
+-- AMBIENT PARTICLES
 local ambAtt, ambEm
 local function enAmbientParticles()
     local ch = LP.Character; if not ch then return end
@@ -1023,17 +1007,13 @@ local function enAmbientParticles()
         NumberSequenceKeypoint.new(0.8, 0),
         NumberSequenceKeypoint.new(1, 1),
     })
-    LP.CharacterAdded:Connect(function(c)
-        task.wait(0.5)
-        if S.AmbientParticles then enAmbientParticles() end
-    end)
 end
 local function dsAmbientParticles()
     if ambEm then ambEm:Destroy(); ambEm = nil end
     if ambAtt then ambAtt:Destroy(); ambAtt = nil end
 end
 
--- 6. Fireflies (светлячки вокруг игрока в большом радиусе)
+-- FIREFLIES
 local fireAtt, fireEm
 local function enFireflies()
     local ch = LP.Character; if not ch then return end
@@ -1070,17 +1050,13 @@ local function enFireflies()
         NumberSequenceKeypoint.new(1, 1),
     })
     fireEm.Acceleration = Vector3.new(0, 0.5, 0)
-    LP.CharacterAdded:Connect(function(c)
-        task.wait(0.5)
-        if S.Fireflies then enFireflies() end
-    end)
 end
 local function dsFireflies()
     if fireEm then fireEm:Destroy(); fireEm = nil end
     if fireAtt then fireAtt:Destroy(); fireAtt = nil end
 end
 
--- 7. Snow FX (снег вокруг игрока большой зоной)
+-- SNOW FX
 local snowAtt, snowEm
 local function enSnowFX()
     local ch = LP.Character; if not ch then return end
@@ -1104,95 +1080,13 @@ local function enSnowFX()
     snowEm.EmissionDirection = Enum.NormalId.Bottom
     snowEm.VelocityInheritance = 0
     snowEm.Acceleration = Vector3.new(0, -1, 0)
-    LP.CharacterAdded:Connect(function(c)
-        task.wait(0.5)
-        if S.SnowFX then enSnowFX() end
-    end)
 end
 local function dsSnowFX()
     if snowEm then snowEm:Destroy(); snowEm = nil end
     if snowAtt then snowAtt:Destroy(); snowAtt = nil end
 end
 
--- 8. Stars (звёзды на небе)
-local starsEffect
-local function enStars()
-    if not starsEffect then
-        starsEffect = Instance.new("Sky")
-        starsEffect.Name = "SVStars"
-        starsEffect.Parent = Lighting
-    end
-    starsEffect.SkyboxBk = "rbxasset://textures/sky/sky512_bk.tex"
-    starsEffect.SkyboxDn = "rbxasset://textures/sky/sky512_dn.tex"
-    starsEffect.SkyboxFt = "rbxasset://textures/sky/sky512_ft.tex"
-    starsEffect.SkyboxLf = "rbxasset://textures/sky/sky512_lf.tex"
-    starsEffect.SkyboxRt = "rbxasset://textures/sky/sky512_rt.tex"
-    starsEffect.SkyboxUp = "rbxasset://textures/sky/sky512_up.tex"
-    starsEffect.StarCount = 5000
-    starsEffect.CelestialBodiesShown = true
-    Lighting.ClockTime = 0
-    Lighting.Brightness = 1
-end
-local function dsStars()
-    if starsEffect then starsEffect:Destroy(); starsEffect = nil end
-    Lighting.ClockTime = OC
-    Lighting.Brightness = OB
-end
-
--- 9. Sky Presets
-local skyPreset
-local function setSky(bk, dn, ft, lf, rt, up)
-    if not skyPreset then
-        skyPreset = Instance.new("Sky")
-        skyPreset.Name = "SVSky"
-        skyPreset.Parent = Lighting
-    end
-    skyPreset.SkyboxBk = bk
-    skyPreset.SkyboxDn = dn
-    skyPreset.SkyboxFt = ft
-    skyPreset.SkyboxLf = lf
-    skyPreset.SkyboxRt = rt
-    skyPreset.SkyboxUp = up
-end
-
-local function skyCity()
-    setSky(
-        "rbxassetid://159305296",
-        "rbxassetid://159305320",
-        "rbxassetid://159305340",
-        "rbxassetid://159305356",
-        "rbxassetid://159305373",
-        "rbxassetid://159305289"
-    )
-end
-
-local function skySunset()
-    setSky(
-        "rbxassetid://159299671",
-        "rbxassetid://159299692",
-        "rbxassetid://159299715",
-        "rbxassetid://159299735",
-        "rbxassetid://159299753",
-        "rbxassetid://159299772"
-    )
-end
-
-local function skySpace()
-    setSky(
-        "rbxasset://textures/sky/sky512_bk.tex",
-        "rbxasset://textures/sky/sky512_dn.tex",
-        "rbxasset://textures/sky/sky512_ft.tex",
-        "rbxasset://textures/sky/sky512_lf.tex",
-        "rbxasset://textures/sky/sky512_rt.tex",
-        "rbxasset://textures/sky/sky512_up.tex"
-    )
-end
-
-local function resetSky()
-    if skyPreset then skyPreset:Destroy(); skyPreset = nil end
-end
-
--- 10. Depth of Field
+-- DEPTH OF FIELD
 local function enDOF()
     if not cineDOF then
         cineDOF = Instance.new("DepthOfFieldEffect", Lighting)
@@ -1207,13 +1101,119 @@ local function dsDOF()
     if cineDOF then cineDOF:Destroy(); cineDOF = nil end
 end
 
+-- SKY SYSTEM (SAFE)
+local skyPreset
+local function getOrCreateSky()
+    if skyPreset and skyPreset.Parent then return skyPreset end
+    local existing = Lighting:FindFirstChildOfClass("Sky")
+    if existing then
+        skyPreset = existing
+    else
+        skyPreset = Instance.new("Sky")
+        skyPreset.Name = "SVSky"
+        skyPreset.Parent = Lighting
+    end
+    return skyPreset
+end
+
+local function setSky(bk, dn, ft, lf, rt, up, stars)
+    local sk = getOrCreateSky()
+    pcall(function()
+        sk.SkyboxBk = bk
+        sk.SkyboxDn = dn
+        sk.SkyboxFt = ft
+        sk.SkyboxLf = lf
+        sk.SkyboxRt = rt
+        sk.SkyboxUp = up
+        sk.CelestialBodiesShown = true
+        sk.StarCount = stars or 3000
+    end)
+end
+
+local function skyCity()
+    setSky(
+        "rbxassetid://161518120",
+        "rbxassetid://161518128",
+        "rbxassetid://161518136",
+        "rbxassetid://161518146",
+        "rbxassetid://161518154",
+        "rbxassetid://161518111"
+    )
+    notify("🏙 City sky loaded")
+end
+
+local function skySunset()
+    setSky(
+        "rbxassetid://161509500",
+        "rbxassetid://161509511",
+        "rbxassetid://161509520",
+        "rbxassetid://161509530",
+        "rbxassetid://161509540",
+        "rbxassetid://161509491"
+    )
+    Lighting.ClockTime = 18
+    Lighting.Brightness = 2
+    notify("🌅 Sunset sky loaded")
+end
+
+local function skyNight()
+    setSky(
+        "rbxassetid://161496486",
+        "rbxassetid://161496497",
+        "rbxassetid://161496507",
+        "rbxassetid://161496517",
+        "rbxassetid://161496527",
+        "rbxassetid://161496478"
+    )
+    Lighting.ClockTime = 0
+    Lighting.Brightness = 1
+    notify("🌙 Night sky loaded")
+end
+
+local function skySpace()
+    local sk = getOrCreateSky()
+    pcall(function()
+        sk.SkyboxBk = "rbxasset://textures/sky/sky512_bk.tex"
+        sk.SkyboxDn = "rbxasset://textures/sky/sky512_dn.tex"
+        sk.SkyboxFt = "rbxasset://textures/sky/sky512_ft.tex"
+        sk.SkyboxLf = "rbxasset://textures/sky/sky512_lf.tex"
+        sk.SkyboxRt = "rbxasset://textures/sky/sky512_rt.tex"
+        sk.SkyboxUp = "rbxasset://textures/sky/sky512_up.tex"
+        sk.StarCount = 5000
+        sk.CelestialBodiesShown = true
+    end)
+    Lighting.ClockTime = 0
+    Lighting.Brightness = 0.5
+    notify("🌌 Space sky loaded")
+end
+
+local function resetSky()
+    if skyPreset then skyPreset:Destroy(); skyPreset = nil end
+    pcall(function()
+        if OriginalSkyData then
+            local sk = Lighting:FindFirstChildOfClass("Sky")
+            if sk then
+                sk.SkyboxBk = OriginalSkyData.Bk
+                sk.SkyboxDn = OriginalSkyData.Dn
+                sk.SkyboxFt = OriginalSkyData.Ft
+                sk.SkyboxLf = OriginalSkyData.Lf
+                sk.SkyboxRt = OriginalSkyData.Rt
+                sk.SkyboxUp = OriginalSkyData.Up
+                sk.StarCount = OriginalSkyData.StarCount or 3000
+            end
+        end
+    end)
+    Lighting.ClockTime = OC
+    Lighting.Brightness = OB
+    notify("↺ Sky reset")
+end
+
 local function resetWorldFX()
     dsNeon(); dsCinematic(); dsVignette(); dsBloom()
-    dsAmbientParticles(); dsFireflies(); dsSnowFX(); dsStars()
-    resetSky(); dsDOF()
+    dsAmbientParticles(); dsFireflies(); dsSnowFX(); dsDOF()
+    resetSky()
     S.Neon=false; S.Cinematic=false; S.Vignette=false; S.Bloom=false
-    S.AmbientParticles=false; S.Fireflies=false; S.SnowFX=false; S.Stars=false
-    S.SkyCity=false; S.SkySunset=false; S.SkyNight=false; S.SkySpace=false
+    S.AmbientParticles=false; S.Fireflies=false; S.SnowFX=false
     S.DepthOfField=false
 end
 
@@ -1226,7 +1226,9 @@ local function teleportToPlayer(target)
     hrp.CFrame = thrp.CFrame + Vector3.new(0, 2, 0)
 end
 
+-- ============================================================
 -- BUILD UI
+-- ============================================================
 sec(VC,"ESP")
 mkToggle(VC,"ESP","Enable ESP Box",enE,dsE)
 
@@ -1280,15 +1282,14 @@ mkSlider(CC,"Trail Lifetime",1,5,1,function(v) trailLifetime=v; if trail then tr
 
 sec(CC,"Body Glow")
 mkToggle(CC,"Glow","Enable Body Glow",enGlow,dsGlow)
-local glowPresets = {
+for _, preset in ipairs({
     {name="Purple", c=Color3.fromRGB(160,140,255), o=Color3.fromRGB(255,120,210)},
     {name="Fire", c=Color3.fromRGB(255,80,40), o=Color3.fromRGB(255,180,60)},
     {name="Ice", c=Color3.fromRGB(100,220,255), o=Color3.fromRGB(200,240,255)},
     {name="Toxic", c=Color3.fromRGB(80,255,120), o=Color3.fromRGB(200,255,80)},
     {name="Gold", c=Color3.fromRGB(255,215,100), o=Color3.fromRGB(255,255,200)},
     {name="Shadow", c=Color3.fromRGB(30,30,40), o=Color3.fromRGB(120,60,200)},
-}
-for _, preset in ipairs(glowPresets) do
+}) do
     mkButton(CC, "Glow: "..preset.name, function()
         glowColor=preset.c; glowOutline=preset.o
         if S.Glow then buildGlow() end
@@ -1298,7 +1299,7 @@ mkSlider(CC,"Glow Transparency %",0,100,50,function(v) glowTransparency=v/100; i
 
 sec(CC,"Custom Aura")
 mkToggle(CC,"CustomAura","Enable Custom Aura",enCustomAura,dsCustomAura)
-local auraPresets = {
+for _, preset in ipairs({
     {name="White", c=Color3.fromRGB(255,255,255)},
     {name="Purple", c=Color3.fromRGB(160,140,255)},
     {name="Pink", c=Color3.fromRGB(255,120,210)},
@@ -1306,8 +1307,7 @@ local auraPresets = {
     {name="Green", c=Color3.fromRGB(120,240,160)},
     {name="Red", c=Color3.fromRGB(255,80,80)},
     {name="Gold", c=Color3.fromRGB(255,215,100)},
-}
-for _, preset in ipairs(auraPresets) do
+}) do
     mkButton(CC, "Aura: "..preset.name, function()
         custColor = preset.c
         if S.CustomAura then buildCustomAura() end
@@ -1333,41 +1333,18 @@ mkSlider(CC,"Speed (x100)",10,300,60,function(v) custSpeed=v/100 end)
 mkSlider(CC,"Orb Size (x100)",10,100,25,function(v) custSize=v/100; if S.CustomAura then buildCustomAura() end end)
 mkToggle(CC,"GlowBobbing","Aura Bobbing",function() custBobbing=true end,function() custBobbing=false end)
 
--- WORLD TAB (original)
 sec(WC,"Lighting")
 mkToggle(WC,"FB","Fullbright",enFB,dsFB)
 mkToggle(WC,"Rainbow","Rainbow Lighting",enRb,dsRb)
 mkSlider(WC,"Clock Time",0,24,math.floor(OC),function(v) Lighting.ClockTime=v end,"h")
 mkButton(WC,"↺ Reset Time",function() Lighting.ClockTime=OC; Lighting.Brightness=OB end)
 
--- WORLD FX TAB (new)
 sec(WVC,"Sky Presets")
-mkButton(WVC,"🏙 City Sky", function()
-    skyCity()
-    notify("City sky loaded")
-end)
-mkButton(WVC,"🌅 Sunset Sky", function()
-    skySunset()
-    notify("Sunset sky loaded")
-end)
-mkButton(WVC,"🌌 Space Sky", function()
-    skySpace()
-    Lighting.ClockTime = 0
-    notify("Space sky loaded")
-end)
-mkButton(WVC,"⭐ Starry Night", function()
-    if not S.Stars then
-        S.Stars = true
-        enStars()
-    else
-        S.Stars = false
-        dsStars()
-    end
-end)
-mkButton(WVC,"↺ Reset Sky", function()
-    resetSky()
-    notify("Sky reset")
-end)
+mkButton(WVC,"🏙 City Sky", skyCity)
+mkButton(WVC,"🌅 Sunset Sky", skySunset)
+mkButton(WVC,"🌙 Night Sky", skyNight)
+mkButton(WVC,"🌌 Space Sky", skySpace)
+mkButton(WVC,"↺ Reset Sky", resetSky)
 
 sec(WVC,"Atmosphere")
 mkToggle(WVC,"Cinematic","Cinematic Color Grade",enCinematic,dsCinematic)
@@ -1470,4 +1447,4 @@ mkButton(DCC,"🌐 Open Discord",function()
     end
 end)
 
-print("[SV] Sleepy Visuals v6.5 loaded OK | PC: " .. tostring(isPC))
+print("[SV] Sleepy Visuals v6.6 loaded OK | PC: " .. tostring(isPC))
