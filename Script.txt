@@ -1,5 +1,5 @@
 --[[
-    Sleepy Visuals v6.2 — Fixed Canvas
+    Sleepy Visuals v6.3 — Animated Menu
 ]]
 
 local Lighting = game:GetService("Lighting")
@@ -103,7 +103,7 @@ IS.TextTransparency = 1; IS.ZIndex = 1001; IS.Parent = IC
 
 local IV = Instance.new("TextLabel")
 IV.Size = UDim2.new(1,0,0,14); IV.Position = UDim2.new(0,0,0,108)
-IV.BackgroundTransparency = 1; IV.Text = "v6.2"
+IV.BackgroundTransparency = 1; IV.Text = "v6.3"
 IV.TextColor3 = C.Muted; IV.TextSize = 9; IV.Font = FB
 IV.TextTransparency = 1; IV.ZIndex = 1001; IV.Parent = IC
 
@@ -143,10 +143,13 @@ local S = {
 local OC = Lighting.ClockTime
 local OB = Lighting.Brightness
 
--- MAIN WINDOW
+-- MAIN
+local MainSize = isPC and UDim2.new(0,740,0,500) or UDim2.new(0,680,0,460)
+local MainPos = UDim2.new(0.5, isPC and -370 or -340, 0.5, isPC and -250 or -230)
+
 local Main = Instance.new("Frame")
-Main.Size = isPC and UDim2.new(0,740,0,500) or UDim2.new(0,680,0,460)
-Main.Position = UDim2.new(0.5, isPC and -370 or -340, 0.5, isPC and -250 or -230)
+Main.Size = MainSize
+Main.Position = MainPos
 Main.BackgroundColor3 = C.Bg
 Main.BorderSizePixel = 0
 Main.Active = true
@@ -156,7 +159,7 @@ cnr(Main,16)
 gr(Main,C.Bg,C.Bg2,90)
 str(Main,C.Stroke,1.5,0.2)
 
--- TOP BAR
+-- TOP
 local Top = Instance.new("Frame")
 Top.Size = UDim2.new(1,0,0,50)
 Top.BackgroundColor3 = C.Panel
@@ -180,7 +183,6 @@ Logo.BackgroundTransparency = 1; Logo.Text = "SLEEPY VISUALS"
 Logo.TextColor3 = C.Text; Logo.TextSize = 12; Logo.Font = FB
 Logo.TextXAlignment = Enum.TextXAlignment.Left; Logo.Parent = Top
 
--- FPS/Ping
 local StatsBox = Instance.new("Frame")
 StatsBox.Size = UDim2.new(0,130,0,22); StatsBox.Position = UDim2.new(1,-190,0.5,-11)
 StatsBox.BackgroundColor3 = C.Card; StatsBox.BorderSizePixel = 0; StatsBox.Parent = Top
@@ -223,7 +225,7 @@ Cls.TextColor3 = C.Dim; Cls.TextSize = 12; Cls.Font = FB
 Cls.AutoButtonColor = false; Cls.Parent = Top
 cnr(Cls,8); str(Cls,C.Stroke,1,0.5)
 
--- TOGGLE BTN
+-- TOGGLE
 local Tg = Instance.new("TextButton")
 Tg.Size = UDim2.new(0,58,0,58); Tg.Position = UDim2.new(0,20,0.5,-29)
 Tg.BackgroundColor3 = Color3.fromRGB(30,26,48); Tg.Text = "SV"
@@ -232,15 +234,85 @@ Tg.AutoButtonColor = false; Tg.Visible = false; Tg.Active = true
 Tg.Draggable = true; Tg.Parent = SG
 cnr(Tg,16); str(Tg,Color3.fromRGB(255,255,255),2,0.2)
 
-Cls.MouseButton1Click:Connect(function() Main.Visible=false; Tg.Visible=true end)
-Tg.MouseButton1Click:Connect(function() Main.Visible=true; Tg.Visible=false end)
+-- ANIMATIONS
+local isAnimating = false
+
+local function closeMenu()
+    if isAnimating then return end
+    isAnimating = true
+    playSound()
+
+    TweenService:Create(Main, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+        Size = UDim2.new(0, 0, 0, 0),
+        Position = UDim2.new(0.5, 0, 0.5, 0),
+    }):Play()
+    TweenService:Create(Main, TweenInfo.new(0.22), {
+        BackgroundTransparency = 0.6,
+    }):Play()
+
+    task.wait(0.22)
+    Main.Visible = false
+    Main.Size = MainSize
+    Main.Position = MainPos
+    Main.BackgroundTransparency = 0
+
+    Tg.Visible = true
+    Tg.Size = UDim2.new(0, 0, 0, 0)
+    Tg.Position = UDim2.new(0, 49, 0.5, 0)
+
+    TweenService:Create(Tg, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        Size = UDim2.new(0, 58, 0, 58),
+        Position = UDim2.new(0, 20, 0.5, -29),
+    }):Play()
+
+    task.wait(0.3)
+    isAnimating = false
+end
+
+local function openMenu()
+    if isAnimating then return end
+    isAnimating = true
+    playSound()
+
+    TweenService:Create(Tg, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+        Size = UDim2.new(0, 0, 0, 0),
+        Position = UDim2.new(0, 49, 0.5, 0),
+    }):Play()
+
+    task.wait(0.22)
+    Tg.Visible = false
+    Tg.Size = UDim2.new(0, 58, 0, 58)
+    Tg.Position = UDim2.new(0, 20, 0.5, -29)
+
+    Main.Visible = true
+    Main.Size = UDim2.new(0, 0, 0, 0)
+    Main.Position = UDim2.new(0.5, 0, 0.5, 0)
+    Main.BackgroundTransparency = 0.6
+
+    TweenService:Create(Main, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        Size = MainSize,
+        Position = MainPos,
+    }):Play()
+    TweenService:Create(Main, TweenInfo.new(0.35), {
+        BackgroundTransparency = 0,
+    }):Play()
+
+    task.wait(0.35)
+    isAnimating = false
+end
+
+Cls.MouseButton1Click:Connect(closeMenu)
+Tg.MouseButton1Click:Connect(openMenu)
 
 if isPC then
     UIS.InputBegan:Connect(function(input, gp)
         if gp then return end
         if input.KeyCode == Enum.KeyCode.LeftControl or input.KeyCode == Enum.KeyCode.RightControl then
-            Main.Visible = not Main.Visible
-            Tg.Visible = not Main.Visible
+            if Main.Visible then
+                closeMenu()
+            else
+                openMenu()
+            end
         end
     end)
 end
@@ -276,7 +348,7 @@ PN.TextColor3 = C.Text; PN.TextSize = 10; PN.Font = FB; PN.Parent = Prof
 
 local PT = Instance.new("TextLabel")
 PT.Size = UDim2.new(1,-8,0,10); PT.Position = UDim2.new(0,4,0,82)
-PT.BackgroundTransparency = 1; PT.Text = "◆ PREMIUM v6.2"
+PT.BackgroundTransparency = 1; PT.Text = "◆ PREMIUM v6.3"
 PT.TextColor3 = C.Acc2; PT.TextSize = 8; PT.Font = FB; PT.Parent = Prof
 
 local Nav = Instance.new("Frame")
@@ -318,7 +390,6 @@ local function navBtn(txt,ico,cd)
     end)
 end
 
--- FIXED mkTab
 local function mkTab()
     local c = Instance.new("ScrollingFrame")
     c.Size = UDim2.new(1, 0, 1, 0)
@@ -358,7 +429,6 @@ navBtn("Server","◆",SVC)
 navBtn("Discord","💬",DCC)
 switch(VC,Btns[1])
 
--- BUILDERS
 local function sec(p,t)
     local s = Instance.new("Frame")
     s.Size = UDim2.new(1,-6,0,28); s.BackgroundColor3 = C.Card
@@ -1139,4 +1209,4 @@ mkButton(DCC,"🌐 Open Discord",function()
     end
 end)
 
-print("[SV] Sleepy Visuals v6.2 loaded OK | PC: " .. tostring(isPC))
+print("[SV] Sleepy Visuals v6.3 loaded OK | PC: " .. tostring(isPC))
