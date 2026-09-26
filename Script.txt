@@ -1,5 +1,5 @@
 --[[
-    Sleepy Visuals v6.3 — Animated Menu
+    Sleepy Visuals v6.5 — World Visuals
 ]]
 
 local Lighting = game:GetService("Lighting")
@@ -103,7 +103,7 @@ IS.TextTransparency = 1; IS.ZIndex = 1001; IS.Parent = IC
 
 local IV = Instance.new("TextLabel")
 IV.Size = UDim2.new(1,0,0,14); IV.Position = UDim2.new(0,0,0,108)
-IV.BackgroundTransparency = 1; IV.Text = "v6.3"
+IV.BackgroundTransparency = 1; IV.Text = "v6.5"
 IV.TextColor3 = C.Muted; IV.TextSize = 9; IV.Font = FB
 IV.TextTransparency = 1; IV.ZIndex = 1001; IV.Parent = IC
 
@@ -135,13 +135,26 @@ end)
 
 -- STATE
 local S = {
-    ESP=false, ESP_Tracers=false, ESP_Health=false, ESP_Distance=false,
+    ESP=false,
     Aura=false, Aura2=false, Trail=false, Glow=false, CustomAura=false,
     IJ=false, Spd=false, JP=false, Fling=false, AFK=false, Fly=false, Noclip=false,
     FB=false, Rainbow=false, Sounds=true,
+    -- World visuals
+    Neon=false, Cinematic=false, Vignette=false, Bloom=false,
+    AmbientParticles=false, Fireflies=false, SnowFX=false, Stars=false,
+    SkyCity=false, SkySunset=false, SkyNight=false, SkySpace=false,
+    DepthOfField=false,
 }
 local OC = Lighting.ClockTime
 local OB = Lighting.Brightness
+local OriginalSkybox = {
+    SkyboxBk = Lighting.Sky.SkyboxBk,
+    SkyboxDn = Lighting.Sky.SkyboxDn,
+    SkyboxFt = Lighting.Sky.SkyboxFt,
+    SkyboxLf = Lighting.Sky.SkyboxLf,
+    SkyboxRt = Lighting.Sky.SkyboxRt,
+    SkyboxUp = Lighting.Sky.SkyboxUp,
+}
 
 -- MAIN
 local MainSize = isPC and UDim2.new(0,740,0,500) or UDim2.new(0,680,0,460)
@@ -234,37 +247,24 @@ Tg.AutoButtonColor = false; Tg.Visible = false; Tg.Active = true
 Tg.Draggable = true; Tg.Parent = SG
 cnr(Tg,16); str(Tg,Color3.fromRGB(255,255,255),2,0.2)
 
--- ANIMATIONS
 local isAnimating = false
 
 local function closeMenu()
     if isAnimating then return end
     isAnimating = true
     playSound()
-
     TweenService:Create(Main, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-        Size = UDim2.new(0, 0, 0, 0),
-        Position = UDim2.new(0.5, 0, 0.5, 0),
+        Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0),
     }):Play()
-    TweenService:Create(Main, TweenInfo.new(0.22), {
-        BackgroundTransparency = 0.6,
-    }):Play()
-
+    TweenService:Create(Main, TweenInfo.new(0.22), {BackgroundTransparency = 0.6}):Play()
     task.wait(0.22)
     Main.Visible = false
-    Main.Size = MainSize
-    Main.Position = MainPos
-    Main.BackgroundTransparency = 0
-
+    Main.Size = MainSize; Main.Position = MainPos; Main.BackgroundTransparency = 0
     Tg.Visible = true
-    Tg.Size = UDim2.new(0, 0, 0, 0)
-    Tg.Position = UDim2.new(0, 49, 0.5, 0)
-
+    Tg.Size = UDim2.new(0, 0, 0, 0); Tg.Position = UDim2.new(0, 49, 0.5, 0)
     TweenService:Create(Tg, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0, 58, 0, 58),
-        Position = UDim2.new(0, 20, 0.5, -29),
+        Size = UDim2.new(0, 58, 0, 58), Position = UDim2.new(0, 20, 0.5, -29),
     }):Play()
-
     task.wait(0.3)
     isAnimating = false
 end
@@ -273,30 +273,19 @@ local function openMenu()
     if isAnimating then return end
     isAnimating = true
     playSound()
-
     TweenService:Create(Tg, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-        Size = UDim2.new(0, 0, 0, 0),
-        Position = UDim2.new(0, 49, 0.5, 0),
+        Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0, 49, 0.5, 0),
     }):Play()
-
     task.wait(0.22)
     Tg.Visible = false
-    Tg.Size = UDim2.new(0, 58, 0, 58)
-    Tg.Position = UDim2.new(0, 20, 0.5, -29)
-
+    Tg.Size = UDim2.new(0, 58, 0, 58); Tg.Position = UDim2.new(0, 20, 0.5, -29)
     Main.Visible = true
-    Main.Size = UDim2.new(0, 0, 0, 0)
-    Main.Position = UDim2.new(0.5, 0, 0.5, 0)
+    Main.Size = UDim2.new(0, 0, 0, 0); Main.Position = UDim2.new(0.5, 0, 0.5, 0)
     Main.BackgroundTransparency = 0.6
-
     TweenService:Create(Main, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-        Size = MainSize,
-        Position = MainPos,
+        Size = MainSize, Position = MainPos,
     }):Play()
-    TweenService:Create(Main, TweenInfo.new(0.35), {
-        BackgroundTransparency = 0,
-    }):Play()
-
+    TweenService:Create(Main, TweenInfo.new(0.35), {BackgroundTransparency = 0}):Play()
     task.wait(0.35)
     isAnimating = false
 end
@@ -308,11 +297,7 @@ if isPC then
     UIS.InputBegan:Connect(function(input, gp)
         if gp then return end
         if input.KeyCode == Enum.KeyCode.LeftControl or input.KeyCode == Enum.KeyCode.RightControl then
-            if Main.Visible then
-                closeMenu()
-            else
-                openMenu()
-            end
+            if Main.Visible then closeMenu() else openMenu() end
         end
     end)
 end
@@ -348,7 +333,7 @@ PN.TextColor3 = C.Text; PN.TextSize = 10; PN.Font = FB; PN.Parent = Prof
 
 local PT = Instance.new("TextLabel")
 PT.Size = UDim2.new(1,-8,0,10); PT.Position = UDim2.new(0,4,0,82)
-PT.BackgroundTransparency = 1; PT.Text = "◆ PREMIUM v6.3"
+PT.BackgroundTransparency = 1; PT.Text = "◆ PREMIUM v6.5"
 PT.TextColor3 = C.Acc2; PT.TextSize = 8; PT.Font = FB; PT.Parent = Prof
 
 local Nav = Instance.new("Frame")
@@ -400,16 +385,13 @@ local function mkTab()
     c.CanvasSize = UDim2.new(0, 0, 0, 500)
     c.Visible = false
     c.Parent = Content
-
     local layout = Instance.new("UIListLayout")
     layout.SortOrder = Enum.SortOrder.LayoutOrder
     layout.Padding = UDim.new(0, 7)
     layout.Parent = c
-
     layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         c.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 30)
     end)
-
     table.insert(Cds, c)
     return c
 end
@@ -418,6 +400,7 @@ local VC = mkTab()
 local PC = mkTab()
 local CC = mkTab()
 local WC = mkTab()
+local WVC = mkTab()
 local SVC = mkTab()
 local DCC = mkTab()
 
@@ -425,6 +408,7 @@ navBtn("Visuals","◈",VC)
 navBtn("Player","◉",PC)
 navBtn("Cosmetics","🎨",CC)
 navBtn("World","◐",WC)
+navBtn("World FX","✨",WVC)
 navBtn("Server","◆",SVC)
 navBtn("Discord","💬",DCC)
 switch(VC,Btns[1])
@@ -553,14 +537,8 @@ end
 
 -- ESP
 local EF = Instance.new("Folder"); EF.Name="ESP_Folder"; EF.Parent=SG
-local TraceFolder = Instance.new("Folder"); TraceFolder.Name="ESP_Tracers"; TraceFolder.Parent=SG
 local eC = {}
-
-local function remE(p)
-    local e = EF:FindFirstChild(p.Name); if e then e:Destroy() end
-    local t = TraceFolder:FindFirstChild(p.Name); if t then t:Destroy() end
-end
-
+local function remE(p) local e=EF:FindFirstChild(p.Name); if e then e:Destroy() end end
 local function mkE(p)
     if p == LP then return end
     local function app(ch)
@@ -579,85 +557,11 @@ local function mkE(p)
         nt.BackgroundTransparency=1; nt.Text = p.DisplayName
         nt.TextColor3 = C.Text; nt.TextSize=8; nt.Font = FB
         nt.TextStrokeTransparency=0.3
-        local hbg = Instance.new("Frame",bb)
-        hbg.Size=UDim2.new(0,3,1,0); hbg.Position=UDim2.new(0,-7,0,0)
-        hbg.BackgroundColor3 = Color3.fromRGB(30,30,30)
-        hbg.BorderSizePixel=0; hbg.Visible = S.ESP_Health
-        local hf = Instance.new("Frame",hbg)
-        hf.Size = UDim2.new(1,0,hum.Health/hum.MaxHealth,0)
-        hf.Position=UDim2.new(0,0,1,0); hf.AnchorPoint = Vector2.new(0,1)
-        hf.BackgroundColor3=C.Green; hf.BorderSizePixel=0
-        local hc = hum.HealthChanged:Connect(function(h)
-            local r = math.clamp(h/hum.MaxHealth,0,1)
-            hf.Size = UDim2.new(1,0,r,0)
-            hf.BackgroundColor3 = r>0.5 and C.Green or r>0.25 and Color3.fromRGB(255,215,100) or Color3.fromRGB(255,110,130)
-        end)
-        local dt = Instance.new("TextLabel",bb)
-        dt.Size = UDim2.new(1,60,0,10); dt.Position=UDim2.new(0.5,-30,1,2)
-        dt.BackgroundTransparency=1; dt.Text = ""; dt.TextColor3 = C.Dim
-        dt.TextSize=8; dt.Font = FM; dt.TextStrokeTransparency=0.3
-        dt.Visible = S.ESP_Distance
-        hum.Died:Connect(function() hc:Disconnect(); remE(p) end)
     end
     if p.Character then app(p.Character) end
     local c = p.CharacterAdded:Connect(function(ch) if S.ESP then task.wait(0.3); app(ch) end end)
     table.insert(eC,c)
 end
-
-task.spawn(function()
-    while Main.Parent do
-        if S.ESP and (S.ESP_Tracers or S.ESP_Distance) then
-            local cam = workspace.CurrentCamera
-            for _, plr in ipairs(Players:GetPlayers()) do
-                if plr ~= LP and plr.Character then
-                    local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
-                    if hrp then
-                        if S.ESP_Distance then
-                            local bb = EF:FindFirstChild(plr.Name)
-                            if bb then
-                                for _, child in ipairs(bb:GetChildren()) do
-                                    if child:IsA("TextLabel") and child.Position.Y.Scale == 1 then
-                                        local dist = math.floor((hrp.Position - cam.CFrame.Position).Magnitude)
-                                        child.Text = dist .. "m"
-                                    end
-                                end
-                            end
-                        end
-                        if S.ESP_Tracers then
-                            local t = TraceFolder:FindFirstChild(plr.Name)
-                            if not t then
-                                t = Instance.new("Frame", TraceFolder)
-                                t.Name = plr.Name
-                                t.BackgroundColor3 = C.Acc1
-                                t.BorderSizePixel = 0
-                                t.Size = UDim2.new(0,1,0,1)
-                                t.ZIndex = 1
-                            end
-                            local pos, onScreen = cam:WorldToViewportPoint(hrp.Position)
-                            if onScreen then
-                                t.Visible = true
-                                local screenSize = cam.ViewportSize
-                                local originX = screenSize.X / 2
-                                local originY = screenSize.Y
-                                local dx = pos.X - originX
-                                local dy = pos.Y - originY
-                                local len = math.sqrt(dx*dx + dy*dy)
-                                local angle = math.atan2(dy, dx)
-                                t.Position = UDim2.new(0, originX, 0, originY)
-                                t.Size = UDim2.new(0, len, 0, 1)
-                                t.Rotation = math.deg(angle)
-                            else
-                                t.Visible = false
-                            end
-                        end
-                    end
-                end
-            end
-        end
-        RS.RenderStepped:Wait()
-    end
-end)
-
 local function enE()
     for _,p in ipairs(Players:GetPlayers()) do mkE(p) end
     local c = Players.PlayerAdded:Connect(function(p) if S.ESP then mkE(p) end end)
@@ -665,7 +569,7 @@ local function enE()
 end
 local function dsE()
     for _,c in ipairs(eC) do pcall(function() c:Disconnect() end) end
-    eC = {}; EF:ClearAllChildren(); TraceFolder:ClearAllChildren()
+    eC = {}; EF:ClearAllChildren()
 end
 
 -- AURAS
@@ -1003,6 +907,316 @@ local function dsRb()
     Lighting.FogColor = Color3.fromRGB(192,192,192)
 end
 
+-- WORLD VISUALS
+local worldEffects = {}
+
+-- 1. Neon World (всё светится)
+local function enNeon()
+    for _, v in ipairs(workspace:GetDescendants()) do
+        if v:IsA("BasePart") and v.Material ~= Enum.Material.Neon and not v:FindFirstChild("SVNeon") then
+            local marker = Instance.new("BoolValue"); marker.Name = "SVNeon"; marker.Parent = v
+            v:SetAttribute("SVOrigMat", tostring(v.Material))
+            v.Material = Enum.Material.Neon
+        end
+    end
+    local conn = workspace.DescendantAdded:Connect(function(v)
+        if S.Neon and v:IsA("BasePart") then
+            task.wait(0.1)
+            v:SetAttribute("SVOrigMat", tostring(v.Material))
+            v.Material = Enum.Material.Neon
+            local m = Instance.new("BoolValue"); m.Name = "SVNeon"; m.Parent = v
+        end
+    end)
+    worldEffects.Neon = conn
+end
+local function dsNeon()
+    if worldEffects.Neon then worldEffects.Neon:Disconnect(); worldEffects.Neon = nil end
+    for _, v in ipairs(workspace:GetDescendants()) do
+        if v:IsA("BasePart") and v:FindFirstChild("SVNeon") then
+            local orig = v:GetAttribute("SVOrigMat")
+            if orig then
+                pcall(function() v.Material = Enum.Material[orig] end)
+            end
+            v:FindFirstChild("SVNeon"):Destroy()
+        end
+    end
+end
+
+-- 2. Cinematic (ColorCorrection)
+local cineEffect, cineBloom, cineVignette, cineDOF
+local function enCinematic()
+    if not cineEffect then
+        cineEffect = Instance.new("ColorCorrectionEffect", Lighting)
+        cineEffect.Name = "SVCinematic"
+    end
+    cineEffect.TintColor = Color3.fromRGB(255, 230, 200)
+    cineEffect.Contrast = 0.2
+    cineEffect.Saturation = -0.1
+    cineEffect.Brightness = -0.02
+    if not cineBloom then
+        cineBloom = Instance.new("BloomEffect", Lighting)
+        cineBloom.Name = "SVBloom"
+        cineBloom.Intensity = 0.7
+        cineBloom.Size = 24
+        cineBloom.Threshold = 1.2
+    end
+end
+local function dsCinematic()
+    if cineEffect then cineEffect:Destroy(); cineEffect = nil end
+    if cineBloom then cineBloom:Destroy(); cineBloom = nil end
+end
+
+-- 3. Vignette
+local function enVignette()
+    if not cineVignette then
+        cineVignette = Instance.new("ColorCorrectionEffect", Lighting)
+        cineVignette.Name = "SVVignette"
+    end
+    cineVignette.Contrast = 0.15
+    cineVignette.Brightness = -0.05
+    -- имитация виньетки через FogEnd
+    Lighting.FogEnd = 300
+end
+local function dsVignette()
+    if cineVignette then cineVignette:Destroy(); cineVignette = nil end
+    Lighting.FogEnd = OriginalSkybox.FogEnd or 100000
+end
+
+-- 4. Bloom
+local function enBloom()
+    if not cineBloom then
+        cineBloom = Instance.new("BloomEffect", Lighting)
+        cineBloom.Name = "SVBloom"
+    end
+    cineBloom.Intensity = 1.5
+    cineBloom.Size = 32
+    cineBloom.Threshold = 0.8
+end
+local function dsBloom()
+    if cineBloom then cineBloom:Destroy(); cineBloom = nil end
+end
+
+-- 5. Ambient Particles (светящиеся частицы вокруг игрока в мире)
+local ambAtt, ambEm
+local function enAmbientParticles()
+    local ch = LP.Character; if not ch then return end
+    local hrp = ch:FindFirstChild("HumanoidRootPart"); if not hrp then return end
+    if ambEm then ambEm:Destroy() end
+    if ambAtt then ambAtt:Destroy() end
+    ambAtt = Instance.new("Attachment", hrp)
+    ambEm = Instance.new("ParticleEmitter", ambAtt)
+    ambEm.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+    ambEm.Rate = 60
+    ambEm.Lifetime = NumberRange.new(2, 3)
+    ambEm.Speed = NumberRange.new(2, 5)
+    ambEm.SpreadAngle = Vector2.new(180, 180)
+    ambEm.Size = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 0.2),
+        NumberSequenceKeypoint.new(0.5, 0.4),
+        NumberSequenceKeypoint.new(1, 0.1),
+    })
+    ambEm.Color = ColorSequence.new(Color3.fromRGB(200, 180, 255))
+    ambEm.LightEmission = 1
+    ambEm.Transparency = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 1),
+        NumberSequenceKeypoint.new(0.2, 0),
+        NumberSequenceKeypoint.new(0.8, 0),
+        NumberSequenceKeypoint.new(1, 1),
+    })
+    LP.CharacterAdded:Connect(function(c)
+        task.wait(0.5)
+        if S.AmbientParticles then enAmbientParticles() end
+    end)
+end
+local function dsAmbientParticles()
+    if ambEm then ambEm:Destroy(); ambEm = nil end
+    if ambAtt then ambAtt:Destroy(); ambAtt = nil end
+end
+
+-- 6. Fireflies (светлячки вокруг игрока в большом радиусе)
+local fireAtt, fireEm
+local function enFireflies()
+    local ch = LP.Character; if not ch then return end
+    local hrp = ch:FindFirstChild("HumanoidRootPart"); if not hrp then return end
+    if fireEm then fireEm:Destroy() end
+    if fireAtt then fireAtt:Destroy() end
+    fireAtt = Instance.new("Attachment", hrp)
+    fireAtt.Shape = Enum.ParticleEmitterShape.Sphere
+    fireAtt.Size = Vector3.new(30, 15, 30)
+    fireEm = Instance.new("ParticleEmitter", fireAtt)
+    fireEm.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+    fireEm.Rate = 25
+    fireEm.Lifetime = NumberRange.new(4, 6)
+    fireEm.Speed = NumberRange.new(0.5, 2)
+    fireEm.SpreadAngle = Vector2.new(180, 180)
+    fireEm.Shape = Enum.ParticleEmitterShape.Sphere
+    fireEm.ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
+    fireEm.Size = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 0),
+        NumberSequenceKeypoint.new(0.3, 0.5),
+        NumberSequenceKeypoint.new(0.7, 0.5),
+        NumberSequenceKeypoint.new(1, 0),
+    })
+    fireEm.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 100)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 200, 50)),
+    })
+    fireEm.LightEmission = 1
+    fireEm.LightInfluence = 0
+    fireEm.Transparency = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 1),
+        NumberSequenceKeypoint.new(0.2, 0),
+        NumberSequenceKeypoint.new(0.8, 0),
+        NumberSequenceKeypoint.new(1, 1),
+    })
+    fireEm.Acceleration = Vector3.new(0, 0.5, 0)
+    LP.CharacterAdded:Connect(function(c)
+        task.wait(0.5)
+        if S.Fireflies then enFireflies() end
+    end)
+end
+local function dsFireflies()
+    if fireEm then fireEm:Destroy(); fireEm = nil end
+    if fireAtt then fireAtt:Destroy(); fireAtt = nil end
+end
+
+-- 7. Snow FX (снег вокруг игрока большой зоной)
+local snowAtt, snowEm
+local function enSnowFX()
+    local ch = LP.Character; if not ch then return end
+    local hrp = ch:FindFirstChild("HumanoidRootPart"); if not hrp then return end
+    if snowEm then snowEm:Destroy() end
+    if snowAtt then snowAtt:Destroy() end
+    snowAtt = Instance.new("Attachment", hrp)
+    snowAtt.Position = Vector3.new(0, 30, 0)
+    snowAtt.Shape = Enum.ParticleEmitterShape.Box
+    snowAtt.Size = Vector3.new(80, 1, 80)
+    snowEm = Instance.new("ParticleEmitter", snowAtt)
+    snowEm.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+    snowEm.Rate = 150
+    snowEm.Lifetime = NumberRange.new(4, 6)
+    snowEm.Speed = NumberRange.new(2, 5)
+    snowEm.SpreadAngle = Vector2.new(180, 180)
+    snowEm.Size = NumberSequence.new(0.6)
+    snowEm.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255))
+    snowEm.LightInfluence = 0.3
+    snowEm.Transparency = NumberSequence.new(0.2)
+    snowEm.EmissionDirection = Enum.NormalId.Bottom
+    snowEm.VelocityInheritance = 0
+    snowEm.Acceleration = Vector3.new(0, -1, 0)
+    LP.CharacterAdded:Connect(function(c)
+        task.wait(0.5)
+        if S.SnowFX then enSnowFX() end
+    end)
+end
+local function dsSnowFX()
+    if snowEm then snowEm:Destroy(); snowEm = nil end
+    if snowAtt then snowAtt:Destroy(); snowAtt = nil end
+end
+
+-- 8. Stars (звёзды на небе)
+local starsEffect
+local function enStars()
+    if not starsEffect then
+        starsEffect = Instance.new("Sky")
+        starsEffect.Name = "SVStars"
+        starsEffect.Parent = Lighting
+    end
+    starsEffect.SkyboxBk = "rbxasset://textures/sky/sky512_bk.tex"
+    starsEffect.SkyboxDn = "rbxasset://textures/sky/sky512_dn.tex"
+    starsEffect.SkyboxFt = "rbxasset://textures/sky/sky512_ft.tex"
+    starsEffect.SkyboxLf = "rbxasset://textures/sky/sky512_lf.tex"
+    starsEffect.SkyboxRt = "rbxasset://textures/sky/sky512_rt.tex"
+    starsEffect.SkyboxUp = "rbxasset://textures/sky/sky512_up.tex"
+    starsEffect.StarCount = 5000
+    starsEffect.CelestialBodiesShown = true
+    Lighting.ClockTime = 0
+    Lighting.Brightness = 1
+end
+local function dsStars()
+    if starsEffect then starsEffect:Destroy(); starsEffect = nil end
+    Lighting.ClockTime = OC
+    Lighting.Brightness = OB
+end
+
+-- 9. Sky Presets
+local skyPreset
+local function setSky(bk, dn, ft, lf, rt, up)
+    if not skyPreset then
+        skyPreset = Instance.new("Sky")
+        skyPreset.Name = "SVSky"
+        skyPreset.Parent = Lighting
+    end
+    skyPreset.SkyboxBk = bk
+    skyPreset.SkyboxDn = dn
+    skyPreset.SkyboxFt = ft
+    skyPreset.SkyboxLf = lf
+    skyPreset.SkyboxRt = rt
+    skyPreset.SkyboxUp = up
+end
+
+local function skyCity()
+    setSky(
+        "rbxassetid://159305296",
+        "rbxassetid://159305320",
+        "rbxassetid://159305340",
+        "rbxassetid://159305356",
+        "rbxassetid://159305373",
+        "rbxassetid://159305289"
+    )
+end
+
+local function skySunset()
+    setSky(
+        "rbxassetid://159299671",
+        "rbxassetid://159299692",
+        "rbxassetid://159299715",
+        "rbxassetid://159299735",
+        "rbxassetid://159299753",
+        "rbxassetid://159299772"
+    )
+end
+
+local function skySpace()
+    setSky(
+        "rbxasset://textures/sky/sky512_bk.tex",
+        "rbxasset://textures/sky/sky512_dn.tex",
+        "rbxasset://textures/sky/sky512_ft.tex",
+        "rbxasset://textures/sky/sky512_lf.tex",
+        "rbxasset://textures/sky/sky512_rt.tex",
+        "rbxasset://textures/sky/sky512_up.tex"
+    )
+end
+
+local function resetSky()
+    if skyPreset then skyPreset:Destroy(); skyPreset = nil end
+end
+
+-- 10. Depth of Field
+local function enDOF()
+    if not cineDOF then
+        cineDOF = Instance.new("DepthOfFieldEffect", Lighting)
+        cineDOF.Name = "SVDOF"
+    end
+    cineDOF.FarIntensity = 0.3
+    cineDOF.FocusDistance = 20
+    cineDOF.InFocusRadius = 15
+    cineDOF.NearIntensity = 0.2
+end
+local function dsDOF()
+    if cineDOF then cineDOF:Destroy(); cineDOF = nil end
+end
+
+local function resetWorldFX()
+    dsNeon(); dsCinematic(); dsVignette(); dsBloom()
+    dsAmbientParticles(); dsFireflies(); dsSnowFX(); dsStars()
+    resetSky(); dsDOF()
+    S.Neon=false; S.Cinematic=false; S.Vignette=false; S.Bloom=false
+    S.AmbientParticles=false; S.Fireflies=false; S.SnowFX=false; S.Stars=false
+    S.SkyCity=false; S.SkySunset=false; S.SkyNight=false; S.SkySpace=false
+    S.DepthOfField=false
+end
+
 local function teleportToPlayer(target)
     local ch = LP.Character; if not ch then return end
     local hrp = ch:FindFirstChild("HumanoidRootPart")
@@ -1015,9 +1229,6 @@ end
 -- BUILD UI
 sec(VC,"ESP")
 mkToggle(VC,"ESP","Enable ESP Box",enE,dsE)
-mkToggle(VC,"ESP_Tracers","Show Tracers (lines)",function() end,function() end)
-mkToggle(VC,"ESP_Health","Show Health Bar",function() end,function() end)
-mkToggle(VC,"ESP_Distance","Show Distance",function() end,function() end)
 
 sec(VC,"Aura")
 mkToggle(VC,"Aura","White Orb Aura",enAura,dsAura)
@@ -1122,11 +1333,61 @@ mkSlider(CC,"Speed (x100)",10,300,60,function(v) custSpeed=v/100 end)
 mkSlider(CC,"Orb Size (x100)",10,100,25,function(v) custSize=v/100; if S.CustomAura then buildCustomAura() end end)
 mkToggle(CC,"GlowBobbing","Aura Bobbing",function() custBobbing=true end,function() custBobbing=false end)
 
+-- WORLD TAB (original)
 sec(WC,"Lighting")
 mkToggle(WC,"FB","Fullbright",enFB,dsFB)
 mkToggle(WC,"Rainbow","Rainbow Lighting",enRb,dsRb)
 mkSlider(WC,"Clock Time",0,24,math.floor(OC),function(v) Lighting.ClockTime=v end,"h")
 mkButton(WC,"↺ Reset Time",function() Lighting.ClockTime=OC; Lighting.Brightness=OB end)
+
+-- WORLD FX TAB (new)
+sec(WVC,"Sky Presets")
+mkButton(WVC,"🏙 City Sky", function()
+    skyCity()
+    notify("City sky loaded")
+end)
+mkButton(WVC,"🌅 Sunset Sky", function()
+    skySunset()
+    notify("Sunset sky loaded")
+end)
+mkButton(WVC,"🌌 Space Sky", function()
+    skySpace()
+    Lighting.ClockTime = 0
+    notify("Space sky loaded")
+end)
+mkButton(WVC,"⭐ Starry Night", function()
+    if not S.Stars then
+        S.Stars = true
+        enStars()
+    else
+        S.Stars = false
+        dsStars()
+    end
+end)
+mkButton(WVC,"↺ Reset Sky", function()
+    resetSky()
+    notify("Sky reset")
+end)
+
+sec(WVC,"Atmosphere")
+mkToggle(WVC,"Cinematic","Cinematic Color Grade",enCinematic,dsCinematic)
+mkToggle(WVC,"Vignette","Vignette (dark edges)",enVignette,dsVignette)
+mkToggle(WVC,"Bloom","Strong Bloom Glow",enBloom,dsBloom)
+mkToggle(WVC,"DepthOfField","Depth of Field (blur)",enDOF,dsDOF)
+
+sec(WVC,"World Effects")
+mkToggle(WVC,"Neon","Neon World (glow parts)",enNeon,dsNeon)
+
+sec(WVC,"Particles")
+mkToggle(WVC,"AmbientParticles","Ambient Sparkles",enAmbientParticles,dsAmbientParticles)
+mkToggle(WVC,"Fireflies","Fireflies (yellow dots)",enFireflies,dsFireflies)
+mkToggle(WVC,"SnowFX","Snow Around You",enSnowFX,dsSnowFX)
+
+sec(WVC,"Reset")
+mkButton(WVC,"🧹 Disable All World FX", function()
+    resetWorldFX()
+    notify("All world effects disabled")
+end)
 
 sec(SVC,"Players")
 task.spawn(function()
@@ -1209,4 +1470,4 @@ mkButton(DCC,"🌐 Open Discord",function()
     end
 end)
 
-print("[SV] Sleepy Visuals v6.3 loaded OK | PC: " .. tostring(isPC))
+print("[SV] Sleepy Visuals v6.5 loaded OK | PC: " .. tostring(isPC))
