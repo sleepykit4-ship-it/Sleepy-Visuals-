@@ -1,5 +1,5 @@
 --[[
-    Sleepy Visuals v6.1 — Fixed Edition
+    Sleepy Visuals v6.2 — Fixed Canvas
 ]]
 
 local Lighting = game:GetService("Lighting")
@@ -41,33 +41,26 @@ local C = {
 local FB = Enum.Font.GothamBold
 local FM = Enum.Font.GothamMedium
 
--- HELPERS
 local function cnr(p,r) local c=Instance.new("UICorner"); c.CornerRadius=UDim.new(0,r or 8); c.Parent=p; return c end
 local function str(p,c,t,tr) local s=Instance.new("UIStroke"); s.Color=c or C.Stroke; s.Thickness=t or 1; s.Transparency=tr or 0; s.ApplyStrokeMode=Enum.ApplyStrokeMode.Border; s.Parent=p; return s end
-local function ll(p,pad) local l=Instance.new("UIListLayout"); l.SortOrder=Enum.SortOrder.LayoutOrder; l.Padding=UDim.new(0,pad or 5); l.Parent=p end
+local function ll(p,pad) local l=Instance.new("UIListLayout"); l.SortOrder=Enum.SortOrder.LayoutOrder; l.Padding=UDim.new(0,pad or 5); l.Parent=p; return l end
 local function gr(p,c1,c2,r) local g=Instance.new("UIGradient",p); g.Color=ColorSequence.new(c1,c2); g.Rotation=r or 90; return g end
 local function tri(p,c1,c2,c3,r)
     local g=Instance.new("UIGradient",p)
     g.Color=ColorSequence.new({ColorSequenceKeypoint.new(0,c1),ColorSequenceKeypoint.new(0.5,c2),ColorSequenceKeypoint.new(1,c3)})
     g.Rotation=r or 90; return g
 end
-
 local function playSound()
     pcall(function()
         local s = Instance.new("Sound")
         s.SoundId = "rbxassetid://6895079853"
-        s.Volume = 0.25
-        s.Parent = SoundService
-        s:Play()
+        s.Volume = 0.25; s.Parent = SoundService; s:Play()
         game:GetService("Debris"):AddItem(s, 1)
     end)
 end
-
 local function notify(text)
     pcall(function()
-        StarterGui:SetCore("SendNotification", {
-            Title = "Sleepy Visuals", Text = text, Duration = 2,
-        })
+        StarterGui:SetCore("SendNotification", {Title = "Sleepy Visuals", Text = text, Duration = 2})
     end)
 end
 
@@ -81,22 +74,14 @@ Intro.ZIndex = 999
 Intro.Parent = SG
 
 local IC = Instance.new("Frame")
-IC.Size = UDim2.new(0,300,0,120)
-IC.Position = UDim2.new(0.5,-150,0.5,-60)
-IC.BackgroundTransparency = 1
-IC.ZIndex = 1000
-IC.Parent = Intro
+IC.Size = UDim2.new(0,300,0,120); IC.Position = UDim2.new(0.5,-150,0.5,-60)
+IC.BackgroundTransparency = 1; IC.ZIndex = 1000; IC.Parent = Intro
 
 local IGlow = Instance.new("Frame")
-IGlow.Size = UDim2.new(0,180,0,180)
-IGlow.Position = UDim2.new(0.5,-90,0.5,-90)
-IGlow.BackgroundColor3 = C.Acc1
-IGlow.BackgroundTransparency = 1
-IGlow.BorderSizePixel = 0
-IGlow.ZIndex = 999
-IGlow.Parent = Intro
-cnr(IGlow, 999)
-gr(IGlow, C.Acc1, C.Acc2, 45)
+IGlow.Size = UDim2.new(0,180,0,180); IGlow.Position = UDim2.new(0.5,-90,0.5,-90)
+IGlow.BackgroundColor3 = C.Acc1; IGlow.BackgroundTransparency = 1
+IGlow.BorderSizePixel = 0; IGlow.ZIndex = 999; IGlow.Parent = Intro
+cnr(IGlow, 999); gr(IGlow, C.Acc1, C.Acc2, 45)
 
 local IT = Instance.new("TextLabel")
 IT.Size = UDim2.new(1,0,0,50); IT.Position = UDim2.new(0,0,0,25)
@@ -118,7 +103,7 @@ IS.TextTransparency = 1; IS.ZIndex = 1001; IS.Parent = IC
 
 local IV = Instance.new("TextLabel")
 IV.Size = UDim2.new(1,0,0,14); IV.Position = UDim2.new(0,0,0,108)
-IV.BackgroundTransparency = 1; IV.Text = "v6.1"
+IV.BackgroundTransparency = 1; IV.Text = "v6.2"
 IV.TextColor3 = C.Muted; IV.TextSize = 9; IV.Font = FB
 IV.TextTransparency = 1; IV.ZIndex = 1001; IV.Parent = IC
 
@@ -158,7 +143,7 @@ local S = {
 local OC = Lighting.ClockTime
 local OB = Lighting.Brightness
 
--- MAIN
+-- MAIN WINDOW
 local Main = Instance.new("Frame")
 Main.Size = isPC and UDim2.new(0,740,0,500) or UDim2.new(0,680,0,460)
 Main.Position = UDim2.new(0.5, isPC and -370 or -340, 0.5, isPC and -250 or -230)
@@ -171,7 +156,7 @@ cnr(Main,16)
 gr(Main,C.Bg,C.Bg2,90)
 str(Main,C.Stroke,1.5,0.2)
 
--- TOP
+-- TOP BAR
 local Top = Instance.new("Frame")
 Top.Size = UDim2.new(1,0,0,50)
 Top.BackgroundColor3 = C.Panel
@@ -179,6 +164,7 @@ Top.BorderSizePixel = 0
 Top.Parent = Main
 cnr(Top,16)
 gr(Top,C.Panel,C.Panel2,90)
+
 local TC = Instance.new("Frame")
 TC.Size = UDim2.new(1,0,0,14); TC.Position = UDim2.new(0,0,1,-14)
 TC.BackgroundColor3 = C.Panel2; TC.BorderSizePixel = 0; TC.Parent = Top
@@ -290,7 +276,7 @@ PN.TextColor3 = C.Text; PN.TextSize = 10; PN.Font = FB; PN.Parent = Prof
 
 local PT = Instance.new("TextLabel")
 PT.Size = UDim2.new(1,-8,0,10); PT.Position = UDim2.new(0,4,0,82)
-PT.BackgroundTransparency = 1; PT.Text = "◆ PREMIUM v6.1"
+PT.BackgroundTransparency = 1; PT.Text = "◆ PREMIUM v6.2"
 PT.TextColor3 = C.Acc2; PT.TextSize = 8; PT.Font = FB; PT.Parent = Prof
 
 local Nav = Instance.new("Frame")
@@ -301,6 +287,7 @@ ll(Nav,4)
 local Content = Instance.new("Frame")
 Content.Size = UDim2.new(1,-206,1,-70); Content.Position = UDim2.new(0,198,0,60)
 Content.BackgroundTransparency = 1; Content.Parent = Main
+Content.ClipsDescendants = true
 
 local Btns, Cds = {}, {}
 
@@ -331,13 +318,29 @@ local function navBtn(txt,ico,cd)
     end)
 end
 
+-- FIXED mkTab
 local function mkTab()
     local c = Instance.new("ScrollingFrame")
-    c.Size = UDim2.new(1,0,1,0); c.BackgroundTransparency = 1
-    c.BorderSizePixel = 0; c.ScrollBarThickness = 3
-    c.ScrollBarImageColor3 = C.Acc1; c.CanvasSize = UDim2.new(0,0,0,0)
-    c.AutomaticCanvasSize = Enum.AutomaticSize.Y; c.Visible = false; c.Parent = Content
-    ll(c,7); table.insert(Cds,c); return c
+    c.Size = UDim2.new(1, 0, 1, 0)
+    c.BackgroundTransparency = 1
+    c.BorderSizePixel = 0
+    c.ScrollBarThickness = 3
+    c.ScrollBarImageColor3 = C.Acc1
+    c.CanvasSize = UDim2.new(0, 0, 0, 500)
+    c.Visible = false
+    c.Parent = Content
+
+    local layout = Instance.new("UIListLayout")
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Padding = UDim.new(0, 7)
+    layout.Parent = c
+
+    layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        c.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 30)
+    end)
+
+    table.insert(Cds, c)
+    return c
 end
 
 local VC = mkTab()
@@ -355,6 +358,7 @@ navBtn("Server","◆",SVC)
 navBtn("Discord","💬",DCC)
 switch(VC,Btns[1])
 
+-- BUILDERS
 local function sec(p,t)
     local s = Instance.new("Frame")
     s.Size = UDim2.new(1,-6,0,28); s.BackgroundColor3 = C.Card
@@ -494,21 +498,17 @@ local function mkE(p)
         local hrp = ch:WaitForChild("HumanoidRootPart",5)
         local hum = ch:WaitForChild("Humanoid",5)
         if not hrp or not hum then return end
-
         local bb = Instance.new("BillboardGui")
         bb.Name = p.Name; bb.AlwaysOnTop = true
         bb.Size = UDim2.new(0,35,0,50); bb.Adornee = hrp; bb.Parent = EF
-
         local box = Instance.new("Frame",bb)
         box.Size=UDim2.new(1,0,1,0); box.BackgroundTransparency=1
         local s = Instance.new("UIStroke",box); s.Color=C.Acc1; s.Thickness=1.5
-
         local nt = Instance.new("TextLabel",bb)
         nt.Size=UDim2.new(1,60,0,12); nt.Position=UDim2.new(0.5,-30,0,-14)
         nt.BackgroundTransparency=1; nt.Text = p.DisplayName
         nt.TextColor3 = C.Text; nt.TextSize=8; nt.Font = FB
         nt.TextStrokeTransparency=0.3
-
         local hbg = Instance.new("Frame",bb)
         hbg.Size=UDim2.new(0,3,1,0); hbg.Position=UDim2.new(0,-7,0,0)
         hbg.BackgroundColor3 = Color3.fromRGB(30,30,30)
@@ -517,19 +517,16 @@ local function mkE(p)
         hf.Size = UDim2.new(1,0,hum.Health/hum.MaxHealth,0)
         hf.Position=UDim2.new(0,0,1,0); hf.AnchorPoint = Vector2.new(0,1)
         hf.BackgroundColor3=C.Green; hf.BorderSizePixel=0
-
         local hc = hum.HealthChanged:Connect(function(h)
             local r = math.clamp(h/hum.MaxHealth,0,1)
             hf.Size = UDim2.new(1,0,r,0)
             hf.BackgroundColor3 = r>0.5 and C.Green or r>0.25 and Color3.fromRGB(255,215,100) or Color3.fromRGB(255,110,130)
         end)
-
         local dt = Instance.new("TextLabel",bb)
         dt.Size = UDim2.new(1,60,0,10); dt.Position=UDim2.new(0.5,-30,1,2)
         dt.BackgroundTransparency=1; dt.Text = ""; dt.TextColor3 = C.Dim
         dt.TextSize=8; dt.Font = FM; dt.TextStrokeTransparency=0.3
         dt.Visible = S.ESP_Distance
-
         hum.Died:Connect(function() hc:Disconnect(); remE(p) end)
     end
     if p.Character then app(p.Character) end
@@ -945,9 +942,7 @@ local function teleportToPlayer(target)
     hrp.CFrame = thrp.CFrame + Vector3.new(0, 2, 0)
 end
 
--- ============================================================
 -- BUILD UI
--- ============================================================
 sec(VC,"ESP")
 mkToggle(VC,"ESP","Enable ESP Box",enE,dsE)
 mkToggle(VC,"ESP_Tracers","Show Tracers (lines)",function() end,function() end)
@@ -971,7 +966,6 @@ mkToggle(PC,"Fling","Anti-Fling",enFl,dsFl)
 mkToggle(PC,"AFK","Anti-AFK",enAFK,dsAFK)
 mkToggle(PC,"Noclip","Noclip",enNc,dsNc)
 
--- Cosmetics
 sec(CC,"Trail")
 mkToggle(CC,"Trail","Enable Trail",enTrail,dsTrail)
 mkButton(CC,"🎨 Trail: Purple/Pink", function()
@@ -1005,14 +999,15 @@ mkSlider(CC,"Trail Lifetime",1,5,1,function(v) trailLifetime=v; if trail then tr
 
 sec(CC,"Body Glow")
 mkToggle(CC,"Glow","Enable Body Glow",enGlow,dsGlow)
-for _, preset in ipairs({
-    {name="🌌 Purple", c=Color3.fromRGB(160,140,255), o=Color3.fromRGB(255,120,210)},
-    {name="🔥 Fire", c=Color3.fromRGB(255,80,40), o=Color3.fromRGB(255,180,60)},
-    {name="❄ Ice", c=Color3.fromRGB(100,220,255), o=Color3.fromRGB(200,240,255)},
-    {name="🌿 Toxic", c=Color3.fromRGB(80,255,120), o=Color3.fromRGB(200,255,80)},
-    {name="👑 Gold", c=Color3.fromRGB(255,215,100), o=Color3.fromRGB(255,255,200)},
-    {name="🖤 Shadow", c=Color3.fromRGB(30,30,40), o=Color3.fromRGB(120,60,200)},
-}) do
+local glowPresets = {
+    {name="Purple", c=Color3.fromRGB(160,140,255), o=Color3.fromRGB(255,120,210)},
+    {name="Fire", c=Color3.fromRGB(255,80,40), o=Color3.fromRGB(255,180,60)},
+    {name="Ice", c=Color3.fromRGB(100,220,255), o=Color3.fromRGB(200,240,255)},
+    {name="Toxic", c=Color3.fromRGB(80,255,120), o=Color3.fromRGB(200,255,80)},
+    {name="Gold", c=Color3.fromRGB(255,215,100), o=Color3.fromRGB(255,255,200)},
+    {name="Shadow", c=Color3.fromRGB(30,30,40), o=Color3.fromRGB(120,60,200)},
+}
+for _, preset in ipairs(glowPresets) do
     mkButton(CC, "Glow: "..preset.name, function()
         glowColor=preset.c; glowOutline=preset.o
         if S.Glow then buildGlow() end
@@ -1022,21 +1017,22 @@ mkSlider(CC,"Glow Transparency %",0,100,50,function(v) glowTransparency=v/100; i
 
 sec(CC,"Custom Aura")
 mkToggle(CC,"CustomAura","Enable Custom Aura",enCustomAura,dsCustomAura)
-for _, preset in ipairs({
-    {name="⚪ White", c=Color3.fromRGB(255,255,255)},
-    {name="💜 Purple", c=Color3.fromRGB(160,140,255)},
-    {name="💗 Pink", c=Color3.fromRGB(255,120,210)},
-    {name="💙 Blue", c=Color3.fromRGB(100,160,255)},
-    {name="💚 Green", c=Color3.fromRGB(120,240,160)},
-    {name="❤ Red", c=Color3.fromRGB(255,80,80)},
-    {name="💛 Gold", c=Color3.fromRGB(255,215,100)},
-}) do
+local auraPresets = {
+    {name="White", c=Color3.fromRGB(255,255,255)},
+    {name="Purple", c=Color3.fromRGB(160,140,255)},
+    {name="Pink", c=Color3.fromRGB(255,120,210)},
+    {name="Blue", c=Color3.fromRGB(100,160,255)},
+    {name="Green", c=Color3.fromRGB(120,240,160)},
+    {name="Red", c=Color3.fromRGB(255,80,80)},
+    {name="Gold", c=Color3.fromRGB(255,215,100)},
+}
+for _, preset in ipairs(auraPresets) do
     mkButton(CC, "Aura: "..preset.name, function()
         custColor = preset.c
         if S.CustomAura then buildCustomAura() end
     end)
 end
-mkButton(CC,"🌈 Aura: Rainbow",function()
+mkButton(CC,"Aura: Rainbow",function()
     task.spawn(function()
         while S.CustomAura and custParts do
             for i, orb in ipairs(custParts) do
@@ -1092,7 +1088,6 @@ mkButton(SVC,"🎯 Server Hop",function()
 end)
 mkToggle(SVC,"Sounds","Sound Effects",function() end,function() end)
 
--- Discord
 local DiscordURL = "https://discord.gg/3apEAu9SZR"
 sec(DCC,"Community")
 local dcCard = Instance.new("Frame")
@@ -1115,7 +1110,7 @@ dcTitle.TextXAlignment = Enum.TextXAlignment.Left; dcTitle.Parent = dcCard
 
 local dcSub = Instance.new("TextLabel")
 dcSub.Size = UDim2.new(1,-80,0,14); dcSub.Position = UDim2.new(0,74,0,42)
-dcSub.BackgroundTransparency = 1; dcSub.Text = "Join our community for updates & support"
+dcSub.BackgroundTransparency = 1; dcSub.Text = "Join our community"
 dcSub.TextColor3 = C.Dim; dcSub.TextSize = 9; dcSub.Font = FM
 dcSub.TextXAlignment = Enum.TextXAlignment.Left; dcSub.Parent = dcCard
 
@@ -1144,4 +1139,4 @@ mkButton(DCC,"🌐 Open Discord",function()
     end
 end)
 
-print("[SV] Sleepy Visuals v6.1 loaded OK | PC: " .. tostring(isPC))
+print("[SV] Sleepy Visuals v6.2 loaded OK | PC: " .. tostring(isPC))
