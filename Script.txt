@@ -5,14 +5,18 @@ local UIS = game:GetService("UserInputService")
 local RS = game:GetService("RunService")
 local LP = Players.LocalPlayer
 local PG = LP:WaitForChild("PlayerGui")
-local Cam = workspace.CurrentCamera
 
 local SG = Instance.new("ScreenGui")
 SG.Name = "SVUI"
 SG.ResetOnSpawn = false
 SG.IgnoreGuiInset = true
+local isPC = UIS.KeyboardEnabled and UIS.MouseEnabled
 local Par = PG
-if gethui then pcall(function() Par = gethui() end) end
+if gethui then
+    pcall(function() Par = gethui() end)
+elseif syn and syn.protect_gui then
+    pcall(function() syn.protect_gui(SG); Par = game:GetService("CoreGui") end)
+end
 if Par:FindFirstChild("SVUI") then Par.SVUI:Destroy() end
 SG.Parent = Par
 
@@ -28,7 +32,7 @@ local C = {
 local FB = Enum.Font.GothamBold
 local FM = Enum.Font.GothamMedium
 
--- INTRO ANIMATION
+-- INTRO
 local Intro = Instance.new("Frame")
 Intro.Size = UDim2.new(1,0,1,0)
 Intro.BackgroundColor3 = Color3.fromRGB(0,0,0)
@@ -37,120 +41,104 @@ Intro.BorderSizePixel = 0
 Intro.ZIndex = 999
 Intro.Parent = SG
 
-local IntroCenter = Instance.new("Frame")
-IntroCenter.Size = UDim2.new(0,300,0,120)
-IntroCenter.Position = UDim2.new(0.5,-150,0.5,-60)
-IntroCenter.BackgroundTransparency = 1
-IntroCenter.ZIndex = 1000
-IntroCenter.Parent = Intro
+local IC = Instance.new("Frame")
+IC.Size = UDim2.new(0,300,0,120)
+IC.Position = UDim2.new(0.5,-150,0.5,-60)
+IC.BackgroundTransparency = 1
+IC.ZIndex = 1000
+IC.Parent = Intro
 
-local IntroGlow = Instance.new("Frame")
-IntroGlow.Size = UDim2.new(0,180,0,180)
-IntroGlow.Position = UDim2.new(0.5,-90,0.5,-90)
-IntroGlow.BackgroundColor3 = C.Acc1
-IntroGlow.BackgroundTransparency = 1
-IntroGlow.BorderSizePixel = 0
-IntroGlow.ZIndex = 999
-IntroGlow.Parent = Intro
-local IG = Instance.new("UICorner", IntroGlow)
-IG.CornerRadius = UDim.new(1,0)
-local IGG = Instance.new("UIGradient", IntroGlow)
+local IGlow = Instance.new("Frame")
+IGlow.Size = UDim2.new(0,180,0,180)
+IGlow.Position = UDim2.new(0.5,-90,0.5,-90)
+IGlow.BackgroundColor3 = C.Acc1
+IGlow.BackgroundTransparency = 1
+IGlow.BorderSizePixel = 0
+IGlow.ZIndex = 999
+IGlow.Parent = Intro
+Instance.new("UICorner", IGlow).CornerRadius = UDim.new(1,0)
+local IGG = Instance.new("UIGradient", IGlow)
 IGG.Color = ColorSequence.new(C.Acc1, C.Acc2)
 IGG.Rotation = 45
 
-local IntroTitle = Instance.new("TextLabel")
-IntroTitle.Size = UDim2.new(1,0,0,50)
-IntroTitle.Position = UDim2.new(0,0,0,25)
-IntroTitle.BackgroundTransparency = 1
-IntroTitle.Text = "SLEEPY VISUALS"
-IntroTitle.TextColor3 = C.Text
-IntroTitle.TextSize = 32
-IntroTitle.Font = FB
-IntroTitle.TextTransparency = 1
-IntroTitle.ZIndex = 1001
-IntroTitle.Parent = IntroCenter
+local IT = Instance.new("TextLabel")
+IT.Size = UDim2.new(1,0,0,50)
+IT.Position = UDim2.new(0,0,0,25)
+IT.BackgroundTransparency = 1
+IT.Text = "SLEEPY VISUALS"
+IT.TextColor3 = C.Text
+IT.TextSize = 32
+IT.Font = FB
+IT.TextTransparency = 1
+IT.ZIndex = 1001
+IT.Parent = IC
 
-local IntroLine = Instance.new("Frame")
-IntroLine.Size = UDim2.new(0,0,0,2)
-IntroLine.Position = UDim2.new(0.5,0,0,80)
-IntroLine.AnchorPoint = Vector2.new(0.5,0)
-IntroLine.BackgroundColor3 = C.Acc1
-IntroLine.BorderSizePixel = 0
-IntroLine.ZIndex = 1001
-IntroLine.Parent = IntroCenter
-local ILG = Instance.new("UIGradient", IntroLine)
+local IL = Instance.new("Frame")
+IL.Size = UDim2.new(0,0,0,2)
+IL.Position = UDim2.new(0.5,0,0,80)
+IL.AnchorPoint = Vector2.new(0.5,0)
+IL.BackgroundColor3 = C.Acc1
+IL.BorderSizePixel = 0
+IL.ZIndex = 1001
+IL.Parent = IC
+local ILG = Instance.new("UIGradient", IL)
 ILG.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, C.Acc1),
-    ColorSequenceKeypoint.new(0.5, C.Acc2),
-    ColorSequenceKeypoint.new(1, C.Acc3),
+    ColorSequenceKeypoint.new(0,C.Acc1),
+    ColorSequenceKeypoint.new(0.5,C.Acc2),
+    ColorSequenceKeypoint.new(1,C.Acc3),
 })
-ILG.Rotation = 0
 
-local IntroSub = Instance.new("TextLabel")
-IntroSub.Size = UDim2.new(1,0,0,16)
-IntroSub.Position = UDim2.new(0,0,0,90)
-IntroSub.BackgroundTransparency = 1
-IntroSub.Text = "premium  •  mobile edition"
-IntroSub.TextColor3 = C.Dim
-IntroSub.TextSize = 10
-IntroSub.Font = FM
-IntroSub.TextTransparency = 1
-IntroSub.ZIndex = 1001
-IntroSub.Parent = IntroCenter
+local IS = Instance.new("TextLabel")
+IS.Size = UDim2.new(1,0,0,16)
+IS.Position = UDim2.new(0,0,0,90)
+IS.BackgroundTransparency = 1
+IS.Text = "premium  •  mobile edition"
+IS.TextColor3 = C.Dim
+IS.TextSize = 10
+IS.Font = FM
+IS.TextTransparency = 1
+IS.ZIndex = 1001
+IS.Parent = IC
 
-local IntroVersion = Instance.new("TextLabel")
-IntroVersion.Size = UDim2.new(1,0,0,14)
-IntroVersion.Position = UDim2.new(0,0,0,108)
-IntroVersion.BackgroundTransparency = 1
-IntroVersion.Text = "v5.0"
-IntroVersion.TextColor3 = C.Muted
-IntroVersion.TextSize = 9
-IntroVersion.Font = FB
-IntroVersion.TextTransparency = 1
-IntroVersion.ZIndex = 1001
-IntroVersion.Parent = IntroCenter
+local IV = Instance.new("TextLabel")
+IV.Size = UDim2.new(1,0,0,14)
+IV.Position = UDim2.new(0,0,0,108)
+IV.BackgroundTransparency = 1
+IV.Text = "v5.2"
+IV.TextColor3 = C.Muted
+IV.TextSize = 9
+IV.Font = FB
+IV.TextTransparency = 1
+IV.ZIndex = 1001
+IV.Parent = IC
 
 task.spawn(function()
-    TweenService:Create(Intro, TweenInfo.new(0.4), {BackgroundTransparency = 0.3}):Play()
+    TweenService:Create(Intro,TweenInfo.new(0.4),{BackgroundTransparency=0.3}):Play()
     task.wait(0.4)
-
-    IntroGlow.BackgroundTransparency = 0.7
-    TweenService:Create(IntroGlow, TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0, 500, 0, 500),
-        Position = UDim2.new(0.5, -250, 0.5, -250),
-        BackgroundTransparency = 1,
+    IGlow.BackgroundTransparency = 0.7
+    TweenService:Create(IGlow,TweenInfo.new(0.8,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{
+        Size=UDim2.new(0,500,0,500),Position=UDim2.new(0.5,-250,0.5,-250),BackgroundTransparency=1
     }):Play()
     task.wait(0.3)
-
-    IntroTitle.TextTransparency = 0
-    IntroTitle.TextSize = 12
-    TweenService:Create(IntroTitle, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-        TextSize = 32,
-    }):Play()
-
+    IT.TextTransparency = 0
+    IT.TextSize = 12
+    TweenService:Create(IT,TweenInfo.new(0.5,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{TextSize=32}):Play()
     task.wait(0.3)
-    TweenService:Create(IntroLine, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0, 280, 0, 2),
-    }):Play()
-
+    TweenService:Create(IL,TweenInfo.new(0.6,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{Size=UDim2.new(0,280,0,2)}):Play()
     task.wait(0.3)
-    TweenService:Create(IntroSub, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
+    TweenService:Create(IS,TweenInfo.new(0.4),{TextTransparency=0}):Play()
     task.wait(0.15)
-    TweenService:Create(IntroVersion, TweenInfo.new(0.4), {TextTransparency = 0.4}):Play()
-
+    TweenService:Create(IV,TweenInfo.new(0.4),{TextTransparency=0.4}):Play()
     task.wait(1.2)
-
-    TweenService:Create(IntroTitle, TweenInfo.new(0.4), {TextTransparency = 1, Position = UDim2.new(0,0,0,10)}):Play()
-    TweenService:Create(IntroLine, TweenInfo.new(0.4), {Size = UDim2.new(0, 0, 0, 2)}):Play()
-    TweenService:Create(IntroSub, TweenInfo.new(0.3), {TextTransparency = 1}):Play()
-    TweenService:Create(IntroVersion, TweenInfo.new(0.3), {TextTransparency = 1}):Play()
-    TweenService:Create(Intro, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
-
+    TweenService:Create(IT,TweenInfo.new(0.4),{TextTransparency=1,Position=UDim2.new(0,0,0,10)}):Play()
+    TweenService:Create(IL,TweenInfo.new(0.4),{Size=UDim2.new(0,0,0,2)}):Play()
+    TweenService:Create(IS,TweenInfo.new(0.3),{TextTransparency=1}):Play()
+    TweenService:Create(IV,TweenInfo.new(0.3),{TextTransparency=1}):Play()
+    TweenService:Create(Intro,TweenInfo.new(0.5),{BackgroundTransparency=1}):Play()
     task.wait(0.6)
     Intro:Destroy()
 end)
 
--- STATE
 local S = {ESP=false,Aura=false,Aura2=false,IJ=false,Spd=false,JP=false,
     Fling=false,AFK=false,Fly=false,Noclip=false,FB=false,Rainbow=false,Trail=false}
 local OC = Lighting.ClockTime
@@ -167,8 +155,8 @@ local function tri(p,c1,c2,c3,r)
 end
 
 local Main = Instance.new("Frame")
-Main.Size = UDim2.new(0,680,0,450)
-Main.Position = UDim2.new(0.5,-340,0.5,-225)
+Main.Size = isPC and UDim2.new(0,740,0,490) or UDim2.new(0,680,0,450)
+Main.Position = isPC and UDim2.new(0.5,-370,0.5,-245) or UDim2.new(0.5,-340,0.5,-225)
 Main.BackgroundColor3 = C.Bg
 Main.BorderSizePixel = 0
 Main.Active = true
@@ -212,6 +200,19 @@ Logo.Font = FB
 Logo.TextXAlignment = Enum.TextXAlignment.Left
 Logo.Parent = Top
 
+if isPC then
+    local Hint = Instance.new("TextLabel")
+    Hint.Size = UDim2.new(0,200,0,12)
+    Hint.Position = UDim2.new(1,-240,0.5,-6)
+    Hint.BackgroundTransparency = 1
+    Hint.Text = "Ctrl — toggle menu"
+    Hint.TextColor3 = C.Muted
+    Hint.TextSize = 8
+    Hint.Font = FB
+    Hint.TextXAlignment = Enum.TextXAlignment.Right
+    Hint.Parent = Top
+end
+
 local Cls = Instance.new("TextButton")
 Cls.Size = UDim2.new(0,26,0,26)
 Cls.Position = UDim2.new(1,-36,0.5,-13)
@@ -243,6 +244,22 @@ str(Tg,Color3.fromRGB(255,255,255),2,0.2)
 
 Cls.MouseButton1Click:Connect(function() Main.Visible=false; Tg.Visible=true end)
 Tg.MouseButton1Click:Connect(function() Main.Visible=true; Tg.Visible=false end)
+
+if isPC then
+    UIS.InputBegan:Connect(function(input, gp)
+        if gp then return end
+        if input.KeyCode == Enum.KeyCode.LeftControl
+            or input.KeyCode == Enum.KeyCode.RightControl then
+            if Main.Visible then
+                Main.Visible = false
+                Tg.Visible = true
+            else
+                Main.Visible = true
+                Tg.Visible = false
+            end
+        end
+    end)
+end
 
 local Side = Instance.new("Frame")
 Side.Size = UDim2.new(0,175,1,-70)
@@ -375,11 +392,13 @@ local VC = mkTab()
 local PC = mkTab()
 local WC = mkTab()
 local SVC = mkTab()
+local DCC = mkTab()
 
 navBtn("Visuals","◈",VC)
 navBtn("Player","◉",PC)
 navBtn("World","◐",WC)
 navBtn("Server","◆",SVC)
+navBtn("Discord","💬",DCC)
 switch(VC,Btns[1])
 
 local function sec(p,t)
@@ -707,7 +726,6 @@ local function dsAura2()
     aura2Parts = {}
 end
 
--- IJ
 local ijC
 local function enIJ()
     ijC = UIS.JumpRequest:Connect(function()
@@ -717,7 +735,6 @@ local function enIJ()
 end
 local function dsIJ() if ijC then ijC:Disconnect(); ijC=nil end end
 
--- SPEED
 local SPD = 50
 local spC
 local function applyS()
@@ -734,7 +751,6 @@ local function dsSpd()
     if ch then local h=ch:FindFirstChildOfClass("Humanoid"); if h then h.WalkSpeed = 16 end end
 end
 
--- JUMP
 local JP = 50
 local jpC
 local function applyJ()
@@ -751,7 +767,6 @@ local function dsJp()
     if ch then local h=ch:FindFirstChildOfClass("Humanoid"); if h then h.JumpPower = 50 end end
 end
 
--- FLING
 local flC
 local function enFl()
     flC = RS.Stepped:Connect(function()
@@ -769,7 +784,6 @@ local function enFl()
 end
 local function dsFl() if flC then flC:Disconnect(); flC=nil end end
 
--- AFK
 local aFC
 local function enAFK()
     aFC = LP.Idled:Connect(function()
@@ -781,7 +795,6 @@ local function enAFK()
 end
 local function dsAFK() if aFC then aFC:Disconnect(); aFC=nil end end
 
--- NOCLIP
 local ncC
 local function enNc()
     ncC = RS.Stepped:Connect(function()
@@ -795,7 +808,6 @@ local function enNc()
 end
 local function dsNc() if ncC then ncC:Disconnect(); ncC=nil end end
 
--- FLY
 local flyC, flyBV, flyBG
 local function enFly()
     local ch = LP.Character
@@ -820,7 +832,7 @@ local function enFly()
         if UIS:IsKeyDown(Enum.KeyCode.A) then dir = dir - cam.CFrame.RightVector end
         if UIS:IsKeyDown(Enum.KeyCode.D) then dir = dir + cam.CFrame.RightVector end
         if UIS:IsKeyDown(Enum.KeyCode.Space) then dir = dir + Vector3.new(0,1,0) end
-        if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then dir = dir - Vector3.new(0,1,0) end
+        if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then dir = dir - Vector3.new(0,1,0) end
         if dir.Magnitude > 0 then dir = dir.Unit end
         flyBV.Velocity = dir * 80
         flyBG.CFrame = cam.CFrame
@@ -832,7 +844,6 @@ local function dsFly()
     if flyBG then flyBG:Destroy(); flyBG=nil end
 end
 
--- FULLBRIGHT
 local fbC
 local function enFB()
     Lighting.Ambient = Color3.fromRGB(255,255,255)
@@ -850,7 +861,6 @@ local function dsFB()
     Lighting.Brightness = OB
 end
 
--- RAINBOW
 local rbC
 local function enRb()
     rbC = RS.Heartbeat:Connect(function()
@@ -868,7 +878,6 @@ local function dsRb()
     Lighting.FogColor = Color3.fromRGB(192,192,192)
 end
 
--- TRAIL
 local trailAtt0, trailAtt1, trail
 local function enTrail()
     local ch = LP.Character
@@ -909,7 +918,6 @@ local function teleportToPlayer(target)
     hrp.CFrame = thrp.CFrame + Vector3.new(0, 2, 0)
 end
 
--- BUILD
 sec(VC,"ESP")
 mkToggle(VC,"ESP","Player ESP Box",enE,dsE)
 
@@ -926,7 +934,7 @@ mkToggle(PC,"Spd","Speed Boost",enSpd,dsSpd)
 mkSlider(PC,"Speed Value",16,300,50,function(v) SPD=v; if S.Spd then applyS() end end)
 mkToggle(PC,"JP","Jump Boost",enJp,dsJp)
 mkSlider(PC,"Jump Power",50,500,50,function(v) JP=v; if S.JP then applyJ() end end)
-mkToggle(PC,"Fly","Fly (WASD + Space/Ctrl)",enFly,dsFly)
+mkToggle(PC,"Fly","Fly (WASD + Space/Shift)",enFly,dsFly)
 
 sec(PC,"Protection")
 mkToggle(PC,"Fling","Anti-Fling",enFl,dsFl)
@@ -957,4 +965,114 @@ mkButton(SVC,"↺  Rejoin Server",function()
     game:GetService("TeleportService"):Teleport(game.PlaceId, LP)
 end)
 
-print("[SV] loaded OK")
+-- DISCORD TAB
+local DiscordURL = "https://discord.gg/3apEAu9SZR"
+
+sec(DCC,"Community")
+
+local dcCard = Instance.new("Frame")
+dcCard.Size = UDim2.new(1,-6,0,110)
+dcCard.BackgroundColor3 = C.Card
+dcCard.BorderSizePixel = 0
+dcCard.Parent = DCC
+cnr(dcCard,10)
+tri(dcCard, Color3.fromRGB(88,101,242), Color3.fromRGB(60,70,180), C.Card, 45)
+str(dcCard, Color3.fromRGB(88,101,242), 1.5, 0.4)
+
+local dcIcon = Instance.new("TextLabel")
+dcIcon.Size = UDim2.new(0,50,0,50)
+dcIcon.Position = UDim2.new(0,16,0,16)
+dcIcon.BackgroundTransparency = 1
+dcIcon.Text = "💬"
+dcIcon.TextSize = 36
+dcIcon.Font = FB
+dcIcon.Parent = dcCard
+
+local dcTitle = Instance.new("TextLabel")
+dcTitle.Size = UDim2.new(1,-80,0,22)
+dcTitle.Position = UDim2.new(0,74,0,20)
+dcTitle.BackgroundTransparency = 1
+dcTitle.Text = "Sleepy Visuals"
+dcTitle.TextColor3 = C.Text
+dcTitle.TextSize = 16
+dcTitle.Font = FB
+dcTitle.TextXAlignment = Enum.TextXAlignment.Left
+dcTitle.Parent = dcCard
+
+local dcSub = Instance.new("TextLabel")
+dcSub.Size = UDim2.new(1,-80,0,14)
+dcSub.Position = UDim2.new(0,74,0,42)
+dcSub.BackgroundTransparency = 1
+dcSub.Text = "Join our community for updates & support"
+dcSub.TextColor3 = C.Dim
+dcSub.TextSize = 9
+dcSub.Font = FM
+dcSub.TextXAlignment = Enum.TextXAlignment.Left
+dcSub.Parent = dcCard
+
+local dcLink = Instance.new("TextLabel")
+dcLink.Size = UDim2.new(1,-30,0,14)
+dcLink.Position = UDim2.new(0,16,0,86)
+dcLink.BackgroundTransparency = 1
+dcLink.Text = DiscordURL
+dcLink.TextColor3 = Color3.fromRGB(200,205,255)
+dcLink.TextSize = 9
+dcLink.Font = FM
+dcLink.TextXAlignment = Enum.TextXAlignment.Left
+dcLink.Parent = dcCard
+
+local function copyDiscord()
+    if setclipboard then
+        setclipboard(DiscordURL)
+    elseif toclipboard then
+        toclipboard(DiscordURL)
+    end
+end
+
+mkButton(DCC,"📋  Copy Discord Link", function()
+    copyDiscord()
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Sleepy Visuals",
+        Text = "Discord link copied!",
+        Duration = 3
+    })
+end)
+
+mkButton(DCC,"🌐  Open Discord (PC only)", function()
+    if isPC then
+        pcall(function()
+            game:GetService("GuiService"):OpenBrowserWindow(DiscordURL)
+        end)
+    else
+        copyDiscord()
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Sleepy Visuals",
+            Text = "Link copied — paste in browser",
+            Duration = 4
+        })
+    end
+end)
+
+sec(DCC,"Info")
+
+local infoBox = Instance.new("Frame")
+infoBox.Size = UDim2.new(1,-6,0,80)
+infoBox.BackgroundColor3 = C.Row
+infoBox.BorderSizePixel = 0
+infoBox.Parent = DCC
+cnr(infoBox,8)
+str(infoBox, C.Stroke, 1, 0.5)
+
+local infoText = Instance.new("TextLabel")
+infoText.Size = UDim2.new(1,-24,1,-16)
+infoText.Position = UDim2.new(0,12,0,8)
+infoText.BackgroundTransparency = 1
+infoText.Text = "• Get help with the script\n• Report bugs\n• Suggest new features\n• Get early access to updates"
+infoText.TextColor3 = C.Dim
+infoText.TextSize = 10
+infoText.Font = FM
+infoText.TextXAlignment = Enum.TextXAlignment.Left
+infoText.TextYAlignment = Enum.TextYAlignment.Top
+infoText.Parent = infoBox
+
+print("[SV] loaded OK  |  PC: " .. tostring(isPC))
